@@ -42,3 +42,36 @@ export const createBoard = (rows, cols, mines = 10) => {
 
     return board;
 };
+
+export const revealEmpty = (board, row, col) => {
+    const rows = board.length;
+    const cols = board[0].length;
+    const stack = [[row, col]];
+    const visited = new Set();
+
+    while (stack.length > 0) {
+        const [r, c] = stack.pop();
+        const key = `${r}-${c}`;
+        if (visited.has(key)) continue;
+        visited.add(key);
+
+        const cell = board[r][c];
+        if (cell.revealed || cell.flagged) continue;
+        cell.revealed = true;
+
+        if (cell.neighbors === 0 && !cell.isMine) {
+            [
+                [-1, -1], [-1, 0], [-1, 1],
+                [0, -1],           [0, 1],
+                [1, -1],  [1, 0],  [1, 1],
+            ].forEach(([dr, dc]) => {
+                const nr = r + dr, nc = c + dc;
+                if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+                    stack.push([nr, nc]);
+                }
+            });
+        }
+    }
+
+    return board;
+};

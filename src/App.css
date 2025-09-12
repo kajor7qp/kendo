@@ -132,7 +132,8 @@ body {
 
 /* Messages */
 .message {
-  margin-top: 12px;
+  position: absolute;
+  margin-top: 152px;
   padding: 8px 12px;
   border-radius: 6px;
   font-weight: 700;

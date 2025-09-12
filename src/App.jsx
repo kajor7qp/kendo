@@ -1,47 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import GameBoard from "./components/GameBoard";
 import StatusBar from "./components/StatusBar";
-import {createBoard} from "./components/CreateBoard.jsx";
+import {createBoard, revealEmpty} from "./components/CreateBoard.jsx";
+import {LEVELS} from "./components/Levels.jsx";
 import "./App.css";
-
-const LEVELS = {
-    easy: { rows: 9, cols: 9, mines: 10 },
-    medium: { rows: 16, cols: 16, mines: 40 },
-    hard: { rows: 16, cols: 30, mines: 99 },
-};
-
-const revealEmpty = (board, row, col) => {
-    const rows = board.length;
-    const cols = board[0].length;
-    const stack = [[row, col]];
-    const visited = new Set();
-
-    while (stack.length > 0) {
-        const [r, c] = stack.pop();
-        const key = `${r}-${c}`;
-        if (visited.has(key)) continue;
-        visited.add(key);
-
-        const cell = board[r][c];
-        if (cell.revealed || cell.flagged) continue;
-        cell.revealed = true;
-
-        if (cell.neighbors === 0 && !cell.isMine) {
-            [
-                [-1, -1], [-1, 0], [-1, 1],
-                [0, -1],           [0, 1],
-                [1, -1],  [1, 0],  [1, 1],
-            ].forEach(([dr, dc]) => {
-                const nr = r + dr, nc = c + dc;
-                if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
-                    stack.push([nr, nc]);
-                }
-            });
-        }
-    }
-
-    return board;
-};
 
 function App() {
     const [level, setLevel] = useState("easy");
@@ -146,7 +108,7 @@ function App() {
         }
 
         setBoard(prev => {
-            const newBoard = prev.map(r => r.map(c => ({ ...c })));
+            const newBoard = prev.map(r => r.map(c => ({...c})));
             const cell = newBoard[row][col];
             if (!cell.revealed) {
                 cell.flagged = !cell.flagged;
@@ -157,7 +119,7 @@ function App() {
 
     const resetGame = (newLevel = level) => {
         setLevel(newLevel);
-        const { rows, cols, mines } = LEVELS[newLevel];
+        const {rows, cols, mines} = LEVELS[newLevel];
         setBoard(createBoard(rows, cols, mines));
         setGameOver(false);
         setWin(false);
@@ -171,22 +133,13 @@ function App() {
 
     return (
         <div className="app-root">
-            <h1 className="title">💣 Minesweeper</h1>
-
             <StatusBar
                 minesLeft={minesLeft}
                 elapsed={elapsed}
-                onReset={() => resetGame(level)}
+                onReset={(event) => resetGame(event ? event : level)}
                 gameOver={gameOver}
                 win={win}
             />
-
-            <div className="level-buttons">
-                <button onClick={() => resetGame("easy")}>Easy</button>
-                <button onClick={() => resetGame("medium")}>Medium</button>
-                <button onClick={() => resetGame("hard")}>Hard</button>
-            </div>
-
             <div className="board-wrapper">
                 <GameBoard
                     board={board}
@@ -196,9 +149,6 @@ function App() {
                     win={win}
                 />
             </div>
-
-            {gameOver && <div className="message message--danger">💥 Game Over!</div>}
-            {win && <div className="message message--win">🎉 You Win!</div>}
         </div>
     );
 }
