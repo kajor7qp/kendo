@@ -11,7 +11,7 @@ const numberColors = {
     8: "#808080",
 };
 
-const GameBoard = ({ board, onCellClick, onCellRightClick, gameOver, win }) => {
+const GameBoard = ({board, onCellClick, onCellRightClick, gameOver, win}) => {
     if (!board || board.length === 0) return null;
     const cols = board[0].length;
 
@@ -26,22 +26,21 @@ const GameBoard = ({ board, onCellClick, onCellRightClick, gameOver, win }) => {
             onContextMenu={(e) => e.preventDefault()}
         >
             {board.flat().map(cell => {
-                const { row, col, revealed, flagged, isMine, neighbors } = cell;
-                let content = null;
+                const {row, col, revealed, flagged, isMine, neighbors} = cell;
 
+                let content = '';
                 if (revealed) {
-                    if (isMine && gameOver) {
-                        // Mine nur zeigen, wenn nicht geflaggt
-                        if (!flagged) content = "💣";
+                    if (isMine && gameOver && !flagged) {
+                        content = "💣";
                     } else if (neighbors > 0) {
                         content = <span style={{ color: numberColors[neighbors] }}>{neighbors}</span>;
                     }
                 } else if (flagged) {
-                    if (gameOver && !isMine) {
-                        content = "❌"; // falsche Flag
-                    } else {
-                        content = "🚩";
-                    }
+                    content = gameOver && !isMine ? "❌" : "🚩";
+                } else if (win && isMine) {
+                    content = "🚩";
+                } else if (gameOver && isMine && !flagged) {
+                    content = "💣";
                 }
 
                 const cellClass = [
@@ -55,7 +54,10 @@ const GameBoard = ({ board, onCellClick, onCellRightClick, gameOver, win }) => {
                         key={`${row}-${col}`}
                         className={cellClass}
                         onClick={() => onCellClick(row, col)}
-                        onContextMenu={(e) => { e.preventDefault(); onCellRightClick(row, col); }}
+                        onContextMenu={(e) => {
+                            e.preventDefault();
+                            onCellRightClick(row, col);
+                        }}
                     >
                         {content}
                     </div>
