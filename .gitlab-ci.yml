@@ -4,7 +4,7 @@ pages:
   script:
     - npm install  # Installiert die Abhängigkeiten
     - npm run build  # Führt den Build-Befehl aus
-    - mv build public  # Verschiebt das Build-Verzeichnis in das public-Verzeichnis
+    - mv dist public  # Verschiebt das dist-Verzeichnis in das public-Verzeichnis
   artifacts:
     paths:
       - public
