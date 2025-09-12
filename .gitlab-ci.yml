@@ -2,7 +2,7 @@ image: node:latest
 
 pages:
   script:
-    - mkdir public
+    - mkdir -p public  # -p erstellt das Verzeichnis nur, wenn es nicht existiert
     - cp index.html public/
   artifacts:
     paths:
