@@ -16,6 +16,7 @@ const GameBoard = ({board, onCellClick, onCellRightClick, gameOver, win}) => {
     const cols = board[0].length;
 
     return (
+        <div>
         <div
             className="board-container"
             style={{
@@ -33,7 +34,7 @@ const GameBoard = ({board, onCellClick, onCellRightClick, gameOver, win}) => {
                     if (isMine && gameOver && !flagged) {
                         content = "💣";
                     } else if (neighbors > 0) {
-                        content = <span style={{ color: numberColors[neighbors] }}>{neighbors}</span>;
+                        content = <span style={{color: numberColors[neighbors]}}>{neighbors}</span>;
                     }
                 } else if (flagged) {
                     content = gameOver && !isMine ? "❌" : "🚩";
@@ -63,8 +64,12 @@ const GameBoard = ({board, onCellClick, onCellRightClick, gameOver, win}) => {
                     </div>
                 );
             })}
+
         </div>
-    );
+            {gameOver && <div className="message message--danger">💥 Game Over!</div>}
+            {win && <div className="message message--win">🎉 You Win!</div>}
+        </div>
+    )
 };
 
 export default GameBoard;

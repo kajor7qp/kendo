@@ -132,10 +132,8 @@ body {
 
 /* Messages */
 .message {
-  position: absolute;
-  margin-top: 152px;
-  padding: 8px 12px;
-  border-radius: 6px;
+  padding: 10px;
+  text-align: center;
   font-weight: 700;
 }
 .message--danger {

@@ -27,8 +27,6 @@ const StatusBar = ({minesLeft, elapsed, onReset, gameOver, win}) => {
                     <span className="status-value">{elapsed}s</span>
                 </div>
             </div>
-            {gameOver && <div className="message message--danger">💥 Game Over!</div>}
-            {win && <div className="message message--win">🎉 You Win!</div>}
         </div>
     );
 };

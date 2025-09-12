@@ -2,7 +2,7 @@ import React, {useState, useEffect} from "react";
 import GameBoard from "./components/GameBoard";
 import StatusBar from "./components/StatusBar";
 import {createBoard, revealEmpty} from "./components/CreateBoard.jsx";
-import {LEVELS} from "./components/Levels.jsx";
+import {checkWin, LEVELS} from "./components/Levels.jsx";
 import "./App.css";
 
 function App() {
@@ -26,10 +26,6 @@ function App() {
         }, 1000);
         return () => clearInterval(id);
     }, [startTime, gameOver, win]);
-
-    const checkWin = (board) => {
-        return board.flat().every(c => (c.isMine ? true : c.revealed));
-    };
 
     const handleCellClick = (row, col) => {
         if (gameOver || win) return;
