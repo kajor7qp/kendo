@@ -1,63 +1,67 @@
-// src/components/GameBoard.jsx
 import React from "react";
 
-const cellStyle = (cell) => {
-    if (cell.revealed) {
-        return {
-            backgroundColor: "#e5e7eb",
-            border: "1px solid #9ca3af",
-            color: cell.isMine ? "red" : "black",
-        };
-    }
-    return {
-        backgroundColor: "#374151",
-        border: "1px solid #4b5563",
-        color: "#d1d5db",
-    };
+/**
+ * createBoard(rows, cols, mines)
+ * liefert ein 2D-Array board[row][col]
+ */
+
+
+const numberColors = {
+    1: "#0000ff", // blau
+    2: "#008000", // grün
+    3: "#ff0000", // rot
+    4: "#000080",
+    5: "#800000",
+    6: "#008080",
+    7: "#000000",
+    8: "#808080",
 };
 
-// src/components/GameBoard.jsx
+const GameBoard = ({ board, onCellClick, onCellRightClick }) => {
+    if (!board || board.length === 0) return null;
+    const cols = board[0].length;
 
-const GameBoard = ({board, onCellClick, onRightClick}) => {
     return (
         <div
-            className="grid gap-0"
+            className="board-container"
             style={{
-                gridTemplateColumns: `repeat(${board[0].length}, 40px)`,
-                justifyContent: "center",
-                width: 660,
-                height: 660
+                display: "grid",
+                gridTemplateColumns: `repeat(${cols}, var(--cell-size))`,
+                gap: "4px",
             }}
+            onContextMenu={(e) => e.preventDefault()} // prevent default global menu
         >
-            {board.flat().map((cell) => {
-                let content = "";
-                if (cell.revealed) {
-                    content = cell.isMine ? "💣" : cell.neighbors || "";
-                } else if (cell.flagged) {
+            {board.flat().map(cell => {
+                const { row, col, revealed, flagged, isMine, neighbors } = cell;
+
+                let content = null;
+                if (revealed) {
+                    if (isMine) content = "💣";
+                    else if (neighbors > 0) content = (
+                        <span style={{ color: numberColors[neighbors] || "#000" }}>
+              {neighbors}
+            </span>
+                    );
+                    else content = null;
+                } else if (flagged) {
                     content = "🚩";
                 }
 
+                const cellClass = [
+                    "cell",
+                    revealed ? "cell--revealed" : "cell--hidden",
+                    revealed && isMine ? "cell--mine" : "",
+                    flagged ? "cell--flagged" : ""
+                ].join(" ");
+
                 return (
                     <div
-                        key={`${cell.row}-${cell.col}`}
-                        style={{
-                            ...cellStyle(cell),
-                            width: 20,
-                            height: 20,
-                            display: "flex",
-                            padding: 0,
-                            justifyContent: "center",
-                            alignItems: "center",
-                            fontWeight: "bold",
-                            cursor: "pointer",
-                            userSelect: "none",
-                            float: "left"
-                        }}
-                        onClick={() => onCellClick(cell.row, cell.col)}
-                        onContextMenu={(e) => {
-                            e.preventDefault();
-                            onRightClick(cell.row, cell.col);
-                        }}
+                        key={`${row}-${col}`}
+                        className={cellClass}
+                        onClick={() => onCellClick(row, col)}
+                        onContextMenu={(e) => { e.preventDefault(); onCellRightClick(row, col); }}
+                        role="button"
+                        aria-label={`cell-${row}-${col}`}
                     >
                         {content}
                     </div>

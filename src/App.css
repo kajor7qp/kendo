@@ -1,42 +1,123 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+:root {
+  --cell-size: 36px; /* Größe der Zellen (änderbar) */
+  --bg: #101214;
+  --panel: #1b1f23;
+  --accent: #2b6cb0;
+  --text: #e6eef7;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.app-root {
+  min-height: 100vh;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.title {
+  margin: 0 0 12px 0;
+  font-size: 24px;
 }
 
-.card {
-  padding: 2em;
+.statusbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 480px;
+  padding: 10px 12px;
+  background: var(--panel);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
 }
 
-.read-the-docs {
-  color: #888;
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: monospace;
+  font-weight: 700;
+}
+
+.status-label { font-size: 18px; }
+.status-value { font-size: 16px; }
+
+.board-wrapper {
+  padding: 8px;
+  background: #0f1720;
+  border-radius: 8px;
+}
+
+.board-container {
+  /* grid wird inline gesetzt (gridTemplateColumns) */
+  padding: 8px;
+  background: #091019;
+  border-radius: 6px;
+}
+
+/* Zellen */
+.cell {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  font-weight: 700;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 2px solid #2f3a45;
+  cursor: pointer;
+}
+
+/* Verdeckt */
+.cell--hidden {
+  background: linear-gradient(180deg, #374151, #2d3843);
+  color: #d1d5db;
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,0.25);
+}
+
+/* Aufgedeckt */
+.cell--revealed {
+  background: linear-gradient(180deg, #e6edf3, #d6dfe7);
+  color: #111827;
+  border: 1px solid #9aa6b2;
+  box-shadow: none;
+}
+
+/* Mine */
+.cell--mine {
+  background: linear-gradient(180deg, #ffdddd, #ffd6d6);
+  color: #9b1c1c;
+}
+
+/* Flag */
+.cell--flagged {
+  /* bleibt wie hidden, aber Inhalt ist 🚩 */
+}
+
+/* Messages */
+.message {
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+.message--danger {
+  background: #3b0b0b;
+  color: #ffdede;
+}
+.message--win {
+  background: #08331b;
+  color: #d3f6dd;
 }
