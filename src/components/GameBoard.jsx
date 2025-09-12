@@ -1,15 +1,9 @@
 import React from "react";
 
-/**
- * createBoard(rows, cols, mines)
- * liefert ein 2D-Array board[row][col]
- */
-
-
 const numberColors = {
-    1: "#0000ff", // blau
-    2: "#008000", // grün
-    3: "#ff0000", // rot
+    1: "#0000ff",
+    2: "#008000",
+    3: "#ff0000",
     4: "#000080",
     5: "#800000",
     6: "#008080",
@@ -17,7 +11,7 @@ const numberColors = {
     8: "#808080",
 };
 
-const GameBoard = ({ board, onCellClick, onCellRightClick }) => {
+const GameBoard = ({ board, onCellClick, onCellRightClick, gameOver, win }) => {
     if (!board || board.length === 0) return null;
     const cols = board[0].length;
 
@@ -29,29 +23,31 @@ const GameBoard = ({ board, onCellClick, onCellRightClick }) => {
                 gridTemplateColumns: `repeat(${cols}, var(--cell-size))`,
                 gap: "4px",
             }}
-            onContextMenu={(e) => e.preventDefault()} // prevent default global menu
+            onContextMenu={(e) => e.preventDefault()}
         >
             {board.flat().map(cell => {
                 const { row, col, revealed, flagged, isMine, neighbors } = cell;
-
                 let content = null;
+
                 if (revealed) {
-                    if (isMine) content = "💣";
-                    else if (neighbors > 0) content = (
-                        <span style={{ color: numberColors[neighbors] || "#000" }}>
-              {neighbors}
-            </span>
-                    );
-                    else content = null;
+                    if (isMine && gameOver) {
+                        // Mine nur zeigen, wenn nicht geflaggt
+                        if (!flagged) content = "💣";
+                    } else if (neighbors > 0) {
+                        content = <span style={{ color: numberColors[neighbors] }}>{neighbors}</span>;
+                    }
                 } else if (flagged) {
-                    content = "🚩";
+                    if (gameOver && !isMine) {
+                        content = "❌"; // falsche Flag
+                    } else {
+                        content = "🚩";
+                    }
                 }
 
                 const cellClass = [
                     "cell",
                     revealed ? "cell--revealed" : "cell--hidden",
-                    revealed && isMine ? "cell--mine" : "",
-                    flagged ? "cell--flagged" : ""
+                    revealed && isMine && gameOver ? "cell--mine" : "",
                 ].join(" ");
 
                 return (
@@ -60,8 +56,6 @@ const GameBoard = ({ board, onCellClick, onCellRightClick }) => {
                         className={cellClass}
                         onClick={() => onCellClick(row, col)}
                         onContextMenu={(e) => { e.preventDefault(); onCellRightClick(row, col); }}
-                        role="button"
-                        aria-label={`cell-${row}-${col}`}
                     >
                         {content}
                     </div>

@@ -31,7 +31,7 @@ body {
 .statusbar {
   display: flex;
   align-items: center;
-  gap: 16px;
+  justify-content: space-between;
   width: 100%;
   max-width: 480px;
   padding: 10px 12px;
@@ -39,6 +39,30 @@ body {
   border-radius: 8px;
   margin-bottom: 12px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+}
+
+.status-face {
+  font-size: 28px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.level-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.level-buttons button {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background: #222;
+  color: var(--text);
+  cursor: pointer;
+}
+.level-buttons button:hover {
+  background: #333;
 }
 
 .status-item {

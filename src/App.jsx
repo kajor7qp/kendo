@@ -4,11 +4,12 @@ import StatusBar from "./components/StatusBar";
 import {createBoard} from "./components/CreateBoard.jsx";
 import "./App.css";
 
-const ROWS = 10;
-const COLS = 10;
-const MINES = 15;
+const LEVELS = {
+    easy: { rows: 9, cols: 9, mines: 10 },
+    medium: { rows: 16, cols: 16, mines: 40 },
+    hard: { rows: 16, cols: 30, mines: 99 },
+};
 
-// Reveal-empty (BFS) - arbeitet in-place auf dem übergebenen Board
 const revealEmpty = (board, row, col) => {
     const rows = board.length;
     const cols = board[0].length;
@@ -31,8 +32,7 @@ const revealEmpty = (board, row, col) => {
                 [0, -1],           [0, 1],
                 [1, -1],  [1, 0],  [1, 1],
             ].forEach(([dr, dc]) => {
-                const nr = r + dr;
-                const nc = c + dc;
+                const nr = r + dr, nc = c + dc;
                 if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
                     stack.push([nr, nc]);
                 }
@@ -44,11 +44,17 @@ const revealEmpty = (board, row, col) => {
 };
 
 function App() {
-    const [board, setBoard] = useState(() => createBoard(ROWS, COLS, MINES));
+    const [level, setLevel] = useState("easy");
+    const [board, setBoard] = useState(() =>
+        createBoard(LEVELS.easy.rows, LEVELS.easy.cols, LEVELS.easy.mines)
+    );
     const [gameOver, setGameOver] = useState(false);
     const [win, setWin] = useState(false);
     const [startTime, setStartTime] = useState(null);
     const [elapsed, setElapsed] = useState(0);
+    const [firstClick, setFirstClick] = useState(true);
+
+    const { rows, cols, mines } = LEVELS[level];
 
     // Timer
     useEffect(() => {
@@ -59,24 +65,64 @@ function App() {
         return () => clearInterval(id);
     }, [startTime, gameOver, win]);
 
-    const revealAllMines = (newBoard) => {
-        newBoard.forEach(row => row.forEach(cell => { if (cell.isMine) cell.revealed = true; }));
+    const checkWin = (board) => {
+        return board.flat().every(c => (c.isMine ? true : c.revealed));
     };
 
     const handleCellClick = (row, col) => {
         if (gameOver || win) return;
-        if (!startTime) setStartTime(Date.now());
 
         setBoard(prev => {
-            const newBoard = prev.map(r => r.map(c => ({ ...c })));
-            const cell = newBoard[row][col];
+            let newBoard = prev.map(r => r.map(c => ({ ...c })));
+            let cell = newBoard[row][col];
+
+            // First click safe
+            if (firstClick) {
+                setFirstClick(false);
+                setStartTime(Date.now());
+                if (cell.isMine) {
+                    do {
+                        newBoard = createBoard(rows, cols, mines);
+                        cell = newBoard[row][col];
+                    } while (cell.isMine);
+                }
+            }
+
+            // Chording
+            if (cell.revealed && cell.neighbors > 0) {
+                const dirs = [
+                    [-1, -1], [-1, 0], [-1, 1],
+                    [0, -1],           [0, 1],
+                    [1, -1],  [1, 0],  [1, 1],
+                ];
+                const neighbors = dirs
+                    .map(([dr, dc]) => [row + dr, col + dc])
+                    .filter(([r, c]) => r >= 0 && r < rows && c >= 0 && c < cols)
+                    .map(([r, c]) => newBoard[r][c]);
+
+                const flagsAround = neighbors.filter(n => n.flagged).length;
+                if (flagsAround === cell.neighbors) {
+                    neighbors.forEach(n => {
+                        if (!n.revealed && !n.flagged) {
+                            if (n.isMine) {
+                                setGameOver(true);
+                                n.revealed = true; // getroffene Mine
+                            } else if (n.neighbors === 0) {
+                                revealEmpty(newBoard, n.row, n.col);
+                            } else {
+                                n.revealed = true;
+                            }
+                        }
+                    });
+                }
+                if (!gameOver && checkWin(newBoard)) setWin(true);
+                return newBoard;
+            }
 
             if (cell.revealed || cell.flagged) return newBoard;
 
             if (cell.isMine) {
-                // Game over: nur Mine auf die geklickt wurde (plus alle Minen aufdecken)
                 cell.revealed = true;
-                revealAllMines(newBoard);
                 setGameOver(true);
                 return newBoard;
             }
@@ -87,21 +133,17 @@ function App() {
                 cell.revealed = true;
             }
 
-            // Win prüfen: alle nicht-minen aufgedeckt
-            const allSafeRevealed = newBoard.flat().every(c => (c.isMine ? true : c.revealed));
-            if (allSafeRevealed) {
-                setWin(true);
-                // optional: reveal all mines on win (visual)
-                revealAllMines(newBoard);
-            }
-
+            if (checkWin(newBoard)) setWin(true);
             return newBoard;
         });
     };
 
     const handleCellRightClick = (row, col) => {
         if (gameOver || win) return;
-        if (!startTime) setStartTime(Date.now());
+        if (firstClick) {
+            setFirstClick(false);
+            setStartTime(Date.now());
+        }
 
         setBoard(prev => {
             const newBoard = prev.map(r => r.map(c => ({ ...c })));
@@ -113,16 +155,19 @@ function App() {
         });
     };
 
-    const resetGame = () => {
-        setBoard(createBoard(ROWS, COLS, MINES));
+    const resetGame = (newLevel = level) => {
+        setLevel(newLevel);
+        const { rows, cols, mines } = LEVELS[newLevel];
+        setBoard(createBoard(rows, cols, mines));
         setGameOver(false);
         setWin(false);
         setStartTime(null);
         setElapsed(0);
+        setFirstClick(true);
     };
 
     const flagsUsed = board.flat().filter(c => c.flagged).length;
-    const minesLeft = MINES - flagsUsed;
+    const minesLeft = mines - flagsUsed;
 
     return (
         <div className="app-root">
@@ -131,16 +176,24 @@ function App() {
             <StatusBar
                 minesLeft={minesLeft}
                 elapsed={elapsed}
-                onReset={resetGame}
+                onReset={() => resetGame(level)}
                 gameOver={gameOver}
                 win={win}
             />
+
+            <div className="level-buttons">
+                <button onClick={() => resetGame("easy")}>Easy</button>
+                <button onClick={() => resetGame("medium")}>Medium</button>
+                <button onClick={() => resetGame("hard")}>Hard</button>
+            </div>
 
             <div className="board-wrapper">
                 <GameBoard
                     board={board}
                     onCellClick={handleCellClick}
                     onCellRightClick={handleCellRightClick}
+                    gameOver={gameOver}
+                    win={win}
                 />
             </div>
 

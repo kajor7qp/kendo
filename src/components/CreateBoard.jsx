@@ -7,10 +7,10 @@ export const createBoard = (rows, cols, mines = 10) => {
             revealed: false,
             flagged: false,
             neighbors: 0,
+            wrongFlag: false, // für GameOver falsche Flags
         }))
     );
 
-    // Minen zufällig platzieren
     let placed = 0;
     while (placed < mines) {
         const r = Math.floor(Math.random() * rows);
@@ -21,7 +21,6 @@ export const createBoard = (rows, cols, mines = 10) => {
         }
     }
 
-    // Nachbarn zählen
     const dirs = [
         [-1, -1], [-1, 0], [-1, 1],
         [0, -1],           [0, 1],
