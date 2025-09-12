@@ -2,8 +2,9 @@ image: node:latest
 
 pages:
   script:
-    - mkdir -p public  # -p erstellt das Verzeichnis nur, wenn es nicht existiert
-    - cp index.html public/
+    - rm -rf public  # Löscht das public-Verzeichnis, falls es existiert
+    - mkdir public    # Erstellt ein neues public-Verzeichnis
+    - cp -r dist/* public/  # Kopiert alle Dateien aus dem src-Verzeichnis
   artifacts:
     paths:
       - public
