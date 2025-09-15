@@ -1,25 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@progress/kendo-react-buttons';
-import { DropDownList } from '@progress/kendo-react-dropdowns';
-import { Grid, GridColumn } from '@progress/kendo-react-grid';
-import { Chart, ChartSeries, ChartSeriesItem, ChartTitle, ChartLegend } from '@progress/kendo-react-charts';
-import { Card, CardBody, CardTitle } from '@progress/kendo-react-layout';
-import { TabStrip, TabStripTab } from '@progress/kendo-react-layout';
-import { Notification, NotificationGroup } from '@progress/kendo-react-notification';
-import { Input } from '@progress/kendo-react-inputs';
-import { Calendar } from '@progress/kendo-react-dateinputs';
-import { Loader } from '@progress/kendo-react-indicators';
+import "@progress/kendo-theme-default/dist/all.css";
+import React, {useState, useEffect} from 'react';
+import {Button} from '@progress/kendo-react-buttons';
+import {DropDownList} from '@progress/kendo-react-dropdowns';
+import {Grid, GridColumn} from '@progress/kendo-react-grid';
+import {Chart, ChartSeries, ChartSeriesItem, ChartTitle, ChartLegend} from '@progress/kendo-react-charts';
+import {Card, CardBody, CardTitle, CardHeader} from '@progress/kendo-react-layout';
+import {TabStrip, TabStripTab} from '@progress/kendo-react-layout';
+import {Notification, NotificationGroup} from '@progress/kendo-react-notification';
+import {Input} from '@progress/kendo-react-inputs';
+import {Calendar} from '@progress/kendo-react-dateinputs';
+import {Loader} from '@progress/kendo-react-indicators';
 
 // Minesweeper Logic
 const LEVELS = {
-    easy: { rows: 9, cols: 9, mines: 10 },
-    medium: { rows: 16, cols: 16, mines: 40 },
-    hard: { rows: 16, cols: 30, mines: 99 },
+    easy: {rows: 9, cols: 9, mines: 10},
+    medium: {rows: 16, cols: 16, mines: 40},
+    hard: {rows: 16, cols: 30, mines: 99},
 };
 
 const createBoard = (rows, cols, mines = 10) => {
-    const board = Array.from({ length: rows }, (_, r) =>
-        Array.from({ length: cols }, (_, c) => ({
+    const board = Array.from({length: rows}, (_, r) =>
+        Array.from({length: cols}, (_, c) => ({
             row: r,
             col: c,
             isMine: false,
@@ -42,8 +43,8 @@ const createBoard = (rows, cols, mines = 10) => {
 
     const dirs = [
         [-1, -1], [-1, 0], [-1, 1],
-        [0, -1],           [0, 1],
-        [1, -1],  [1, 0],  [1, 1],
+        [0, -1], [0, 1],
+        [1, -1], [1, 0], [1, 1],
     ];
 
     for (let r = 0; r < rows; r++) {
@@ -82,8 +83,8 @@ const revealEmpty = (board, row, col) => {
         if (cell.neighbors === 0 && !cell.isMine) {
             [
                 [-1, -1], [-1, 0], [-1, 1],
-                [0, -1],           [0, 1],
-                [1, -1],  [1, 0],  [1, 1],
+                [0, -1], [0, 1],
+                [1, -1], [1, 0], [1, 1],
             ].forEach(([dr, dc]) => {
                 const nr = r + dr, nc = c + dc;
                 if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
@@ -124,12 +125,12 @@ function App() {
 
     // Statistics
     const [gameStats, setGameStats] = useState([
-        { id: 1, level: 'Easy', time: 45, result: 'Win', date: '2024-09-10' },
-        { id: 2, level: 'Medium', time: 120, result: 'Win', date: '2024-09-11' },
-        { id: 3, level: 'Hard', time: 300, result: 'Lose', date: '2024-09-12' },
+        {id: 1, level: 'Easy', time: 45, result: 'Win', date: '2024-09-10'},
+        {id: 2, level: 'Medium', time: 120, result: 'Win', date: '2024-09-11'},
+        {id: 3, level: 'Hard', time: 300, result: 'Lose', date: '2024-09-12'},
     ]);
 
-    const { rows, cols, mines } = LEVELS[level];
+    const {rows, cols, mines} = LEVELS[level];
 
     // Timer effect
     useEffect(() => {
@@ -145,13 +146,13 @@ function App() {
         if (gameOver) {
             setNotification({
                 id: Date.now(),
-                type: { style: 'error', icon: true },
+                type: {style: 'error', icon: true},
                 content: '💣 Game Over! Try again!'
             });
         } else if (win) {
             setNotification({
                 id: Date.now(),
-                type: { style: 'success', icon: true },
+                type: {style: 'success', icon: true},
                 content: `🎉 You Win! Time: ${elapsed}s`
             });
             // Add to statistics
@@ -165,38 +166,124 @@ function App() {
         }
     }, [gameOver, win, elapsed, level]);
 
+    const [mouseButtons, setMouseButtons] = useState(0);
+
+    useEffect(() => {
+        const handleDown = (e) => setMouseButtons(e.buttons);
+        const handleUp = () => setMouseButtons(0);
+
+        window.addEventListener("mousedown", handleDown);
+        window.addEventListener("mouseup", handleUp);
+
+        return () => {
+            window.removeEventListener("mousedown", handleDown);
+            window.removeEventListener("mouseup", handleUp);
+        };
+    }, []);
+
+
     const handleCellClick = (row, col) => {
         if (gameOver || win) return;
 
         setBoard(prev => {
-            let newBoard = prev.map(r => r.map(c => ({ ...c })));
+            let newBoard = prev.map(r => r.map(c => ({...c})));
             let cell = newBoard[row][col];
 
-            if (firstClick) {
-                setFirstClick(false);
-                setStartTime(Date.now());
-                if (cell.isMine) {
-                    do {
-                        newBoard = createBoard(rows, cols, mines);
-                        cell = newBoard[row][col];
-                    } while (cell.isMine);
+            if (mouseButtons === 3 && cell.revealed && cell.neighbors > 0) {
+                const dirs = [
+                    [-1, -1], [-1, 0], [-1, 1],
+                    [0, -1], [0, 1],
+                    [1, -1], [1, 0], [1, 1],
+                ];
+
+                const neighbors = dirs
+                    .map(([dr, dc]) => {
+                        const nr = row + dr, nc = col + dc;
+                        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+                            return newBoard[nr][nc];
+                        }
+                        return null;
+                    })
+                    .filter(n => n);
+
+                const flaggedCount = neighbors.filter(n => n.flagged).length;
+
+                if (flaggedCount === cell.neighbors) {
+                    neighbors.forEach(n => {
+                        if (!n.revealed && !n.flagged) {
+                            if (n.isMine) {
+                                n.revealed = true;
+                                setGameOver(true);
+                            } else if (n.neighbors === 0) {
+                                revealEmpty(newBoard, n.row, n.col);
+                            } else {
+                                n.revealed = true;
+                            }
+                        }
+                    });
+                }
+            } else {
+
+                // Erster Klick = Timer starten und Board ggf. neu generieren
+                if (firstClick) {
+                    setFirstClick(false);
+                    setStartTime(Date.now());
+                    if (cell.isMine) {
+                        do {
+                            newBoard = createBoard(rows, cols, mines);
+                            cell = newBoard[row][col];
+                        } while (cell.isMine);
+                    }
+                }
+
+                // Wenn das Feld bereits aufgedeckt ist → prüfen, ob "Chord"-Funktion ausgelöst wird
+                if (cell.revealed && cell.neighbors > 0) {
+                    const dirs = [
+                        [-1, -1], [-1, 0], [-1, 1],
+                        [0, -1], [0, 1],
+                        [1, -1], [1, 0], [1, 1],
+                    ];
+
+                    const neighbors = dirs
+                        .map(([dr, dc]) => {
+                            const nr = row + dr, nc = col + dc;
+                            if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+                                return newBoard[nr][nc];
+                            }
+                            return null;
+                        })
+                        .filter(n => n);
+
+                    const flaggedCount = neighbors.filter(n => n.flagged).length;
+
+                    // Wenn so viele Flaggen gesetzt sind wie die Zahl angibt → decke alle unmarkierten Nachbarn auf
+                    if (flaggedCount === cell.neighbors) {
+                        neighbors.forEach(n => {
+                            if (!n.revealed && !n.flagged) {
+                                if (n.isMine) {
+                                    n.revealed = true;
+                                    setGameOver(true);
+                                } else if (n.neighbors === 0) {
+                                    revealEmpty(newBoard, n.row, n.col);
+                                } else {
+                                    n.revealed = true;
+                                }
+                            }
+                        });
+                    }
+                }
+                // Normale Klick-Logik
+                else if (!cell.revealed && !cell.flagged) {
+                    if (cell.isMine) {
+                        cell.revealed = true;
+                        setGameOver(true);
+                    } else if (cell.neighbors === 0) {
+                        revealEmpty(newBoard, row, col);
+                    } else {
+                        cell.revealed = true;
+                    }
                 }
             }
-
-            if (cell.revealed || cell.flagged) return newBoard;
-
-            if (cell.isMine) {
-                cell.revealed = true;
-                setGameOver(true);
-                return newBoard;
-            }
-
-            if (cell.neighbors === 0) {
-                revealEmpty(newBoard, row, col);
-            } else {
-                cell.revealed = true;
-            }
-
             if (checkWin(newBoard)) setWin(true);
             return newBoard;
         });
@@ -212,7 +299,7 @@ function App() {
         }
 
         setBoard(prev => {
-            const newBoard = prev.map(r => r.map(c => ({ ...c })));
+            const newBoard = prev.map(r => r.map(c => ({...c})));
             const cell = newBoard[row][col];
             if (!cell.revealed) {
                 cell.flagged = !cell.flagged;
@@ -225,7 +312,7 @@ function App() {
         setLoading(true);
         setTimeout(() => {
             setLevel(newLevel);
-            const { rows, cols, mines } = LEVELS[newLevel];
+            const {rows, cols, mines} = LEVELS[newLevel];
             setBoard(createBoard(rows, cols, mines));
             setGameOver(false);
             setWin(false);
@@ -236,7 +323,7 @@ function App() {
 
             setNotification({
                 id: Date.now(),
-                type: { style: 'info', icon: true },
+                type: {style: 'info', icon: true},
                 content: `New ${newLevel} game started!`
             });
         }, 500);
@@ -247,8 +334,8 @@ function App() {
 
     // Chart data for statistics
     const winLossData = [
-        { category: 'Wins', value: gameStats.filter(g => g.result === 'Win').length, color: '#10b981' },
-        { category: 'Losses', value: gameStats.filter(g => g.result === 'Lose').length, color: '#ef4444' }
+        {category: 'Wins', value: gameStats.filter(g => g.result === 'Win').length, color: '#10b981'},
+        {category: 'Losses', value: gameStats.filter(g => g.result === 'Lose').length, color: '#ef4444'}
     ];
 
     const levelData = LEVELS ? Object.keys(LEVELS).map(lvl => ({
@@ -301,26 +388,33 @@ function App() {
         cursor: 'pointer',
         borderRadius: '4px',
         transition: 'all 0.2s ease',
+
         backgroundColor: cell.revealed
-            ? (cell.isMine ? '#ef4444' : '#e5e7eb')
-            : (cell.flagged ? '#fbbf24' : '#9ca3af'),
+            ? (cell.isMine ? '#dc2626' : '#f3f4f6') // rot für Minen, hellgrau für Zahlen
+            : (cell.flagged ? '#facc15' : '#6b7280'), // gelb für Flaggen, grau für verdeckt
+
         color: cell.revealed
-            ? (cell.isMine ? 'white' : (cell.neighbors > 0 ? numberColors[cell.neighbors] : '#374151'))
-            : 'white',
-        border: `2px solid ${cell.revealed ? '#d1d5db' : '#6b7280'}`,
-        boxShadow: cell.revealed ? 'inset 0 2px 4px rgba(0,0,0,0.1)' : '0 2px 4px rgba(0,0,0,0.2)'
+            ? (cell.isMine
+                ? '#ffffff' // weiße Bombe
+                : (cell.neighbors > 0 ? numberColors[cell.neighbors] : '#1f2937')) // dunkle Zahlen
+            : '#f9fafb', // verdeckte Felder: fast weiß
+
+        border: `2px solid ${cell.revealed ? '#d1d5db' : '#4b5563'}`,
+        boxShadow: cell.revealed
+            ? 'inset 0 2px 4px rgba(0,0,0,0.1)'
+            : '0 2px 4px rgba(0,0,0,0.2)'
     });
 
     return (
         <div style={containerStyle}>
-            <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+            <div style={{maxWidth: '1400px', margin: '0 auto'}}>
 
                 {/* Header */}
                 <div style={headerStyle}>
-                    <h1 style={{ fontSize: '3rem', margin: '0 0 20px 0', textShadow: '2px 2px 4px rgba(0,0,0,0.3)' }}>
+                    <h1 style={{fontSize: '3rem', margin: '0 0 20px 0', textShadow: '2px 2px 4px rgba(0,0,0,0.3)'}}>
                         💣 KendoReact Minesweeper
                     </h1>
-                    <p style={{ fontSize: '1.2rem', opacity: 0.9 }}>
+                    <p style={{fontSize: '1.2rem', opacity: 0.9}}>
                         Enhanced Minesweeper with KendoReact Components
                     </p>
                 </div>
@@ -336,7 +430,7 @@ function App() {
 
                             {/* Game Tab */}
                             <TabStripTab title="🎮 Play Game">
-                                <div style={{ padding: '30px' }}>
+                                <div style={{padding: '30px'}}>
 
                                     {/* Game Controls */}
                                     <div style={{
@@ -352,19 +446,24 @@ function App() {
 
                                         {/* Level Selection */}
                                         <div>
-                                            <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', color: '#374151' }}>
+                                            <label style={{
+                                                display: 'block',
+                                                marginBottom: '10px',
+                                                fontWeight: '600',
+                                                color: '#374151'
+                                            }}>
                                                 Difficulty Level:
                                             </label>
                                             <DropDownList
                                                 data={['easy', 'medium', 'hard']}
                                                 value={level}
                                                 onChange={(e) => resetGame(e.value)}
-                                                style={{ width: '150px' }}
+                                                style={{width: '150px'}}
                                             />
                                         </div>
 
                                         {/* Game Status */}
-                                        <div style={{ textAlign: 'center' }}>
+                                        <div style={{textAlign: 'center'}}>
                                             <div style={{
                                                 fontSize: '3rem',
                                                 marginBottom: '10px',
@@ -375,22 +474,23 @@ function App() {
                                                 display: 'inline-block',
                                                 boxShadow: '0 5px 15px rgba(0, 0, 0, 0.2)'
                                             }} onClick={() => resetGame()}>
-                                                {loading ? <Loader size="small" /> : face}
+                                                {loading ? <Loader size="small"/> : face}
                                             </div>
-                                            <div style={{ fontSize: '1.2rem', fontWeight: '600', color: '#374151' }}>
+                                            <div style={{fontSize: '1.2rem', fontWeight: '600', color: '#374151'}}>
                                                 {gameOver ? 'Game Over!' : win ? 'You Win!' : 'Playing...'}
                                             </div>
                                         </div>
 
                                         {/* Game Info */}
-                                        <div style={{ textAlign: 'right' }}>
-                                            <div style={{ marginBottom: '10px' }}>
-                                                <span style={{ fontWeight: '600', color: '#374151' }}>🚩 Mines Left: </span>
-                                                <span style={{ fontSize: '1.2rem', color: '#ef4444' }}>{minesLeft}</span>
+                                        <div style={{textAlign: 'right'}}>
+                                            <div style={{marginBottom: '10px'}}>
+                                                <span
+                                                    style={{fontWeight: '600', color: '#374151'}}>🚩 Mines Left: </span>
+                                                <span style={{fontSize: '1.2rem', color: '#ef4444'}}>{minesLeft}</span>
                                             </div>
                                             <div>
-                                                <span style={{ fontWeight: '600', color: '#374151' }}>⏱ Time: </span>
-                                                <span style={{ fontSize: '1.2rem', color: '#059669' }}>{elapsed}s</span>
+                                                <span style={{fontWeight: '600', color: '#374151'}}>⏱ Time: </span>
+                                                <span style={{fontSize: '1.2rem', color: '#059669'}}>{elapsed}s</span>
                                             </div>
                                         </div>
                                     </div>
@@ -443,10 +543,13 @@ function App() {
                                                 );
                                             })}
                                         </div>
+
+
                                     </div>
 
+
                                     {/* Quick Actions */}
-                                    <div style={{ display: 'flex', justifyContent: 'center', gap: '15px' }}>
+                                    <div style={{display: 'flex', justifyContent: 'center', gap: '15px'}}>
                                         <Button primary onClick={() => resetGame('easy')}>
                                             🟢 Easy Game
                                         </Button>
@@ -457,23 +560,43 @@ function App() {
                                             🔴 Hard Game
                                         </Button>
                                     </div>
+                                    <Card style={{marginTop: "20px", maxWidth: "420px"}}>
+                                        <CardHeader>
+                                            <h5 className="k-card-title">💡 Spielfunktionen</h5>
+                                        </CardHeader>
+                                        <CardBody>
+                                            <p className="text-sm text-gray-700 leading-relaxed">
+                                                - <strong>Linksklick auf Zahl</strong>: Deckt alle Nachbarn auf, wenn
+                                                die richtige Anzahl
+                                                Flaggen gesetzt ist. <br/>
+                                                - <strong>Links+Rechtsklick (Chord)</strong>: Profi-Shortcut, der das
+                                                gleiche macht –
+                                                schneller und ohne Extra-Klick.
+                                            </p>
+                                        </CardBody>
+                                    </Card>
                                 </div>
                             </TabStripTab>
 
                             {/* Statistics Tab */}
                             <TabStripTab title="📊 Statistics">
-                                <div style={{ padding: '30px' }}>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginBottom: '30px' }}>
+                                <div style={{padding: '30px'}}>
+                                    <div style={{
+                                        display: 'grid',
+                                        gridTemplateColumns: '1fr 1fr',
+                                        gap: '30px',
+                                        marginBottom: '30px'
+                                    }}>
 
                                         {/* Win/Loss Chart */}
-                                        <Card style={{ borderRadius: '15px', boxShadow: '0 5px 15px rgba(0,0,0,0.1)' }}>
+                                        <Card style={{borderRadius: '15px', boxShadow: '0 5px 15px rgba(0,0,0,0.1)'}}>
                                             <CardBody>
-                                                <CardTitle style={{ marginBottom: '20px', color: '#374151' }}>
+                                                <CardTitle style={{marginBottom: '20px', color: '#374151'}}>
                                                     🏆 Win/Loss Ratio
                                                 </CardTitle>
-                                                <Chart style={{ height: '300px' }}>
-                                                    <ChartTitle text="" />
-                                                    <ChartLegend position="bottom" />
+                                                <Chart style={{height: '300px'}}>
+                                                    <ChartTitle text=""/>
+                                                    <ChartLegend position="bottom"/>
                                                     <ChartSeries>
                                                         <ChartSeriesItem
                                                             type="donut"
@@ -488,13 +611,13 @@ function App() {
                                         </Card>
 
                                         {/* Games by Level */}
-                                        <Card style={{ borderRadius: '15px', boxShadow: '0 5px 15px rgba(0,0,0,0.1)' }}>
+                                        <Card style={{borderRadius: '15px', boxShadow: '0 5px 15px rgba(0,0,0,0.1)'}}>
                                             <CardBody>
-                                                <CardTitle style={{ marginBottom: '20px', color: '#374151' }}>
+                                                <CardTitle style={{marginBottom: '20px', color: '#374151'}}>
                                                     🎯 Games by Difficulty
                                                 </CardTitle>
-                                                <Chart style={{ height: '300px' }}>
-                                                    <ChartTitle text="" />
+                                                <Chart style={{height: '300px'}}>
+                                                    <ChartTitle text=""/>
                                                     <ChartSeries>
                                                         <ChartSeriesItem
                                                             type="column"
@@ -510,23 +633,24 @@ function App() {
                                     </div>
 
                                     {/* Game History Grid */}
-                                    <Card style={{ borderRadius: '15px', boxShadow: '0 5px 15px rgba(0,0,0,0.1)' }}>
+                                    <Card style={{borderRadius: '15px', boxShadow: '0 5px 15px rgba(0,0,0,0.1)'}}>
                                         <CardBody>
-                                            <CardTitle style={{ marginBottom: '20px', color: '#374151' }}>
+                                            <CardTitle style={{marginBottom: '20px', color: '#374151'}}>
                                                 📈 Game History
                                             </CardTitle>
                                             <Grid
                                                 data={gameStats}
-                                                style={{ height: '350px' }}
+                                                style={{height: '350px'}}
+                                                className="k-grid k-grid-md"
                                             >
-                                                <GridColumn field="level" title="Level" width="120px" />
-                                                <GridColumn field="time" title="Time (s)" width="100px" />
+                                                <GridColumn field="level" title="Level" width="120px"/>
+                                                <GridColumn field="time" title="Time (s)" width="100px"/>
                                                 <GridColumn
                                                     field="result"
                                                     title="Result"
                                                     width="100px"
-                                                    cell={({ dataItem }) => (
-                                                        <td style={{ padding: '8px' }}>
+                                                    cell={({dataItem}) => (
+                                                        <td style={{padding: '8px'}}>
                               <span style={{
                                   padding: '4px 12px',
                                   borderRadius: '12px',
@@ -540,7 +664,7 @@ function App() {
                                                         </td>
                                                     )}
                                                 />
-                                                <GridColumn field="date" title="Date" width="120px" />
+                                                <GridColumn field="date" title="Date" width="120px"/>
                                             </Grid>
                                         </CardBody>
                                     </Card>
@@ -549,28 +673,42 @@ function App() {
 
                             {/* Profile Tab */}
                             <TabStripTab title="👤 Player Profile">
-                                <div style={{ padding: '30px' }}>
-                                    <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-                                        <Card style={{ borderRadius: '15px', boxShadow: '0 5px 15px rgba(0,0,0,0.1)' }}>
+                                <div style={{padding: '30px'}}>
+                                    <div style={{maxWidth: '600px', margin: '0 auto'}}>
+                                        <Card style={{borderRadius: '15px', boxShadow: '0 5px 15px rgba(0,0,0,0.1)'}}>
                                             <CardBody>
-                                                <CardTitle style={{ marginBottom: '30px', color: '#374151', textAlign: 'center' }}>
+                                                <CardTitle style={{
+                                                    marginBottom: '30px',
+                                                    color: '#374151',
+                                                    textAlign: 'center'
+                                                }}>
                                                     🎮 Player Profile
                                                 </CardTitle>
 
-                                                <div style={{ marginBottom: '25px' }}>
-                                                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151' }}>
+                                                <div style={{marginBottom: '25px'}}>
+                                                    <label style={{
+                                                        display: 'block',
+                                                        marginBottom: '8px',
+                                                        fontWeight: '600',
+                                                        color: '#374151'
+                                                    }}>
                                                         Player Name:
                                                     </label>
                                                     <Input
                                                         value={playerName}
                                                         onChange={(e) => setPlayerName(e.value)}
                                                         placeholder="Enter your name..."
-                                                        style={{ width: '100%' }}
+                                                        style={{width: '100%'}}
                                                     />
                                                 </div>
 
-                                                <div style={{ marginBottom: '25px' }}>
-                                                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151' }}>
+                                                <div style={{marginBottom: '25px'}}>
+                                                    <label style={{
+                                                        display: 'block',
+                                                        marginBottom: '8px',
+                                                        fontWeight: '600',
+                                                        color: '#374151'
+                                                    }}>
                                                         Favorite Game Date:
                                                     </label>
                                                     <Calendar
@@ -585,25 +723,36 @@ function App() {
                                                     borderRadius: '15px',
                                                     textAlign: 'center'
                                                 }}>
-                                                    <h3 style={{ color: '#374151', marginBottom: '15px' }}>🏆 Your Stats</h3>
-                                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px' }}>
+                                                    <h3 style={{color: '#374151', marginBottom: '15px'}}>🏆 Your
+                                                        Stats</h3>
+                                                    <div style={{
+                                                        display: 'grid',
+                                                        gridTemplateColumns: '1fr 1fr 1fr',
+                                                        gap: '15px'
+                                                    }}>
                                                         <div>
-                                                            <div style={{ fontSize: '2rem', color: '#10b981' }}>
+                                                            <div style={{fontSize: '2rem', color: '#10b981'}}>
                                                                 {gameStats.filter(g => g.result === 'Win').length}
                                                             </div>
-                                                            <div style={{ fontSize: '0.9rem', color: '#6b7280' }}>Total Wins</div>
+                                                            <div style={{fontSize: '0.9rem', color: '#6b7280'}}>Total
+                                                                Wins
+                                                            </div>
                                                         </div>
                                                         <div>
-                                                            <div style={{ fontSize: '2rem', color: '#f59e0b' }}>
+                                                            <div style={{fontSize: '2rem', color: '#f59e0b'}}>
                                                                 {gameStats.length}
                                                             </div>
-                                                            <div style={{ fontSize: '0.9rem', color: '#6b7280' }}>Games Played</div>
+                                                            <div style={{fontSize: '0.9rem', color: '#6b7280'}}>Games
+                                                                Played
+                                                            </div>
                                                         </div>
                                                         <div>
-                                                            <div style={{ fontSize: '2rem', color: '#8b5cf6' }}>
+                                                            <div style={{fontSize: '2rem', color: '#8b5cf6'}}>
                                                                 {gameStats.length > 0 ? Math.round((gameStats.filter(g => g.result === 'Win').length / gameStats.length) * 100) : 0}%
                                                             </div>
-                                                            <div style={{ fontSize: '0.9rem', color: '#6b7280' }}>Win Rate</div>
+                                                            <div style={{fontSize: '0.9rem', color: '#6b7280'}}>Win
+                                                                Rate
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -626,10 +775,10 @@ function App() {
                     textAlign: 'center',
                     border: '1px solid rgba(255, 255, 255, 0.2)'
                 }}>
-                    <p style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>
+                    <p style={{margin: '0 0 10px 0', fontSize: '1.1rem'}}>
                         🚀 Built for KendoReact Challenge with ❤️
                     </p>
-                    <div style={{ fontSize: '0.9rem', opacity: 0.8 }}>
+                    <div style={{fontSize: '0.9rem', opacity: 0.8}}>
                         <strong>11+ KendoReact Components:</strong> Button, DropDownList, Grid, Chart, Card,
                         TabStrip, Notification, Input, Calendar, Loader, NotificationGroup
                     </div>
@@ -639,11 +788,15 @@ function App() {
                 <NotificationGroup
                     style={{
                         position: 'fixed',
-                        right: '20px',
-                        top: '20px',
-                        zIndex: 1000
+                        bottom: '20px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        zIndex: 1000,
+                        display: 'flex',
+                        justifyContent: 'center'
                     }}
                 >
+
                     {notification && (
                         <Notification
                             type={notification.type}
@@ -656,7 +809,7 @@ function App() {
                                 minWidth: '300px'
                             }}
                         >
-              <span style={{ fontWeight: '500' }}>
+              <span style={{fontWeight: '500'}}>
                 {notification.content}
               </span>
                         </Notification>
