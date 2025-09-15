@@ -1,13 +1,14 @@
+// Hier kommen deine Spiellogik-Funktionen rein
 export const createBoard = (rows, cols, mines = 10) => {
-    const board = Array.from({ length: rows }, (_, r) =>
-        Array.from({ length: cols }, (_, c) => ({
+    const board = Array.from({length: rows}, (_, r) =>
+        Array.from({length: cols}, (_, c) => ({
             row: r,
             col: c,
             isMine: false,
             revealed: false,
             flagged: false,
             neighbors: 0,
-            wrongFlag: false, // für GameOver falsche Flags
+            id: `${r}-${c}`
         }))
     );
 
@@ -23,9 +24,10 @@ export const createBoard = (rows, cols, mines = 10) => {
 
     const dirs = [
         [-1, -1], [-1, 0], [-1, 1],
-        [0, -1],           [0, 1],
-        [1, -1],  [1, 0],  [1, 1],
+        [0, -1], [0, 1],
+        [1, -1], [1, 0], [1, 1],
     ];
+
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
             if (board[r][c].isMine) continue;
@@ -62,8 +64,8 @@ export const revealEmpty = (board, row, col) => {
         if (cell.neighbors === 0 && !cell.isMine) {
             [
                 [-1, -1], [-1, 0], [-1, 1],
-                [0, -1],           [0, 1],
-                [1, -1],  [1, 0],  [1, 1],
+                [0, -1], [0, 1],
+                [1, -1], [1, 0], [1, 1],
             ].forEach(([dr, dc]) => {
                 const nr = r + dr, nc = c + dc;
                 if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
@@ -72,6 +74,9 @@ export const revealEmpty = (board, row, col) => {
             });
         }
     }
-
     return board;
+};
+
+export const checkWin = (board) => {
+    return board.flat().every(c => (c.isMine ? true : c.revealed));
 };
