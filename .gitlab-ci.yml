@@ -3,16 +3,13 @@ stages:
   - build
   - deploy
 
-variables:
-  NODE_VERSION: "18"
-
 cache:
   paths:
     - node_modules/
 
 build:
   stage: build
-  image: node:$NODE_VERSION
+  image: node:latest
   script:
     - npm ci
     - npm run build
@@ -31,4 +28,4 @@ pages:
     paths:
       - public
   only:
-    - main # oder master, je nach deinem Branch-Name
+    - master
