@@ -1,4 +1,3 @@
-# .gitlab-ci.yml
 stages:
   - build
   - deploy
@@ -24,6 +23,7 @@ pages:
   script:
     - mkdir -p public
     - cp -r dist/* public/
+    - echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>GitLab Pages</title></head><body><h1>GitLab Pages</h1></body></html>' > public/index.html
   artifacts:
     paths:
       - public
