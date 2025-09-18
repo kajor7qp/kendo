@@ -22,7 +22,7 @@ pages:
   stage: deploy
   image: alpine:latest
   script:
-    - mkdir public
+    - mkdir -p public
     - cp -r dist/* public/
   artifacts:
     paths:
