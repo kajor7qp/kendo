@@ -1,13 +1,83 @@
+---
+title: 🚀 KendoReact Minesweeper Challenge - Modern Gaming Dashboard
+published: true
+description: A modern Minesweeper game built with 11+ KendoReact components featuring analytics, player profiles, and smooth animations
+tags: devchallenge, kendoreactchallenge, webdev, react
+cover_image: # Optional: Screenshot deiner App
+---
+
+# 🚀 KendoReact Minesweeper Challenge
+
+I built a modern Minesweeper game using 11+ KendoReact free components for the DEV Challenge!
+
+## 🎮 What I Built
+
+A complete gaming dashboard featuring:
+- Classic Minesweeper gameplay with 3 difficulty levels
+- Real-time analytics and statistics
+- Player profile management
+- Modern glassmorphism UI design
+
+## 🔗 Links
+
+- **🌐 Live Demo**: [Your-App-URL]
+- **💻 Source Code**: [Your-GitLab-URL]
+
+## ✨ Features
+
+### Core Gameplay
+- Classic Minesweeper mechanics (left-click reveal, right-click flag)
+- Three difficulty levels: Easy (9x9), Medium (16x16), Hard (16x30)
+- Real-time timer and mine counter
+- Smart first-click protection
+
+### Modern Dashboard
+- **Analytics Tab**: Win/Loss charts and difficulty statistics
+- **Player Profile**: Name input and game date tracking
+- **Responsive Design**: Works on all screen sizes
+- **Smooth Animations**: Hover effects and transitions
+
+## 🛠️ KendoReact Components Used (11+)
+
+1. **Button** - Level selection and game actions
+2. **DropDownList** - Difficulty level selection
+3. **Grid** - Game statistics table
+4. **Chart** - Analytics visualization (2 different charts)
+5. **Card** - Structured layout sections
+6. **TabStrip** - Navigation between game/stats/profile
+7. **Notification** - Game over/win alerts
+8. **Input** - Player name input
+9. **Calendar** - Date selection in profile
+10. **Loader** - Loading animations
+11. **NotificationGroup** - Notification management
+
+## 🎨 Technical Highlights
+
+- **Modern UI**: Glassmorphism design with gradient backgrounds
+- **State Management**: Complex game state with React hooks
+- **Game Logic**: Complete Minesweeper algorithm implementation
+- **Statistics**: Real-time game tracking and analytics
+- **Responsive**: Mobile-friendly responsive design
+
+## 🚀 Getting Started
+``` bash
+git clone [your-gitlab-url]
+cd [your-project-name]
+npm install
+npm run dev
+``` 
+
 # React + Vite
 
 ## Projekt aufsetzen
+
 ```
-npm create vite@latest kendo-vite-app -- --template react
+npm create vite@latest kendo-vite-app -- --template react 
 ```
-```
+``` 
 cd kendo-vite-app
 ```
-```
+``` 
 npm install
 ```
 
