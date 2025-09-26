@@ -8,7 +8,7 @@ const Header = ({ rows, cols, mines, time, onReset }) => {
                 <p className="text-sm">Größe: {rows} × {cols}</p>
                 <p className="text-sm">Minen: {mines}</p>
             </div>
-            <div className="text-lg font-bold">⏱ {time}s</div>
+            <div className="text-lg font-mono font-bold">⏱ {time}</div>
             <Button themeColor="primary" onClick={onReset}>🔄 Reset</Button>
         </div>
     );

@@ -8,10 +8,12 @@ import {Card, CardBody, CardTitle, CardHeader} from '@progress/kendo-react-layou
 import {TabStrip, TabStripTab} from '@progress/kendo-react-layout';
 import {Notification, NotificationGroup} from '@progress/kendo-react-notification';
 import {Input} from '@progress/kendo-react-inputs';
-import {Calendar} from '@progress/kendo-react-dateinputs';
 import {Loader} from '@progress/kendo-react-indicators';
 import {checkWin, createBoard, revealEmpty} from "./utils/boardUtils.jsx";
 import {numberColors} from "./utils/styles.jsx";
+import Header from "./components/Header.jsx";
+
+
 
 // Minesweeper Logic
 const LEVELS = {
@@ -34,8 +36,17 @@ function App() {
     const [selectedTab, setSelectedTab] = useState(0);
     const [notification, setNotification] = useState(null);
     const [playerName, setPlayerName] = useState('');
-    const [gameDate, setGameDate] = useState(new Date());
     const [loading, setLoading] = useState(false);
+
+    const [users, setUsers] = useState(() => {
+        const savedUsers = localStorage.getItem('minesweeperUsers');
+        return savedUsers ? JSON.parse(savedUsers) : [];
+    });
+
+    const [currentUser, setCurrentUser] = useState(() => {
+        const savedCurrentUser = localStorage.getItem('minesweeperCurrentUser');
+        return savedCurrentUser || '';
+    });
 
     // Statistics
     const [gameStats, setGameStats] = useState(() => {
@@ -43,8 +54,24 @@ function App() {
         return savedStats ? JSON.parse(savedStats) : [];
     });
 
+    const formatTime = (milliseconds) => {
+        const ms = milliseconds % 1000;
+        const seconds = Math.floor(milliseconds / 1000);
+        return `${seconds}.${ms.toString().padStart(3, '0')}`;
+    };
+
+
 
     const {rows, cols, mines} = LEVELS[level];
+
+    useEffect(() => {
+        localStorage.setItem('minesweeperUsers', JSON.stringify(users));
+    }, [users]);
+
+    useEffect(() => {
+        localStorage.setItem('minesweeperCurrentUser', currentUser);
+    }, [currentUser]);
+
 
     useEffect(() => {
         localStorage.setItem('minesweeperStats', JSON.stringify(gameStats));
@@ -55,42 +82,34 @@ function App() {
     useEffect(() => {
         if (!startTime || gameOver || win) return;
         const id = setInterval(() => {
-            setElapsed(Math.floor((Date.now() - startTime) / 1000));
-        }, 1000);
+            setElapsed((Date.now() - startTime));
+        }, 10);
         return () => clearInterval(id);
     }, [startTime, gameOver, win]);
 
     // Notification when game ends
     useEffect(() => {
-        if (gameOver) {
-            setNotification({
-                id: Date.now(),
-                type: {style: 'error', icon: true},
-                content: '💣 Game Over! Try again!'
-            });
+        if (gameOver || win) {
+            if (!currentUser) {
+                setNotification({
+                    id: Date.now(),
+                    type: {style: 'warning', icon: true},
+                    content: 'Bitte wähle zuerst einen Benutzer!'
+                });
+                return;
+            }
+
             setGameStats(prev => [...prev, {
                 id: prev.length + 1,
+                username: currentUser,
                 level: level.charAt(0).toUpperCase() + level.slice(1),
                 time: elapsed,
-                result: 'Lose',
-                date: new Date().toISOString().split('T')[0]
-            }]);
-        } else if (win) {
-            setNotification({
-                id: Date.now(),
-                type: {style: 'success', icon: true},
-                content: `🎉 You Win! Time: ${elapsed}s`
-            });
-            // Add to statistics
-            setGameStats(prev => [...prev, {
-                id: prev.length + 1,
-                level: level.charAt(0).toUpperCase() + level.slice(1),
-                time: elapsed,
-                result: 'Win',
+                result: gameOver ? 'Lose' : 'Win',
                 date: new Date().toISOString().split('T')[0]
             }]);
         }
-    }, [gameOver, win, elapsed, level]);
+
+    }, [gameOver, win, elapsed, level, currentUser]);
 
     const [mouseButtons, setMouseButtons] = useState(0);
 
@@ -106,6 +125,18 @@ function App() {
             window.removeEventListener("mouseup", handleUp);
         };
     }, []);
+
+    const addUser = (name) => {
+        if (name && !users.includes(name)) {
+            setUsers(prev => [...prev, name]);
+            setCurrentUser(name);
+            setNotification({
+                id: Date.now(),
+                type: {style: 'success', icon: true},
+                content: `Benutzer ${name} wurde erstellt!`
+            });
+        }
+    };
 
 
     const handleCellClick = (row, col) => {
@@ -428,6 +459,14 @@ function App() {
                                         </div>
 
                                         {/* Game Info */}
+                                        <Header
+                                            rows={LEVELS[level].rows}
+                                            cols={LEVELS[level].cols}
+                                            mines={LEVELS[level].mines}
+                                            time={formatTime(elapsed)}
+                                            onReset={resetGame}
+                                        />
+
                                         <div style={{textAlign: 'right'}}>
                                             <div style={{marginBottom: '10px'}}>
                                                 <span
@@ -608,128 +647,125 @@ function App() {
                                                 📈 Game History
                                             </CardTitle>
                                             <Grid
-                                                data={gameStats}
+                                                data={gameStats.filter(game => currentUser ? game.username === currentUser : true)}
+                                                sortable={true}
                                                 style={{height: '350px'}}
-                                                className="k-grid k-grid-md"
                                             >
-                                                <GridColumn field="level" title="Level" width="120px"/>
-                                                <GridColumn field="time" title="Time (s)" width="100px"/>
+                                                <GridColumn field="username" title="Spieler" width="120px"/>
+                                                <GridColumn field="level" title="Level" width="100px"/>
                                                 <GridColumn
-                                                    field="result"
-                                                    title="Result"
-                                                    width="100px"
+                                                    field="time"
+                                                    title="Zeit (s)"
+                                                    width="120px"
                                                     cell={({dataItem}) => (
-                                                        <td style={{padding: '8px'}}>
-                              <span style={{
-                                  padding: '4px 12px',
-                                  borderRadius: '12px',
-                                  fontSize: '12px',
-                                  fontWeight: '600',
-                                  backgroundColor: dataItem.result === 'Win' ? '#10b981' : '#ef4444',
-                                  color: 'white'
-                              }}>
-                                {dataItem.result === 'Win' ? '🏆 Win' : '💣 Lose'}
-                              </span>
-                                                        </td>
+                                                        <td>{formatTime(dataItem.time)}</td>
                                                     )}
                                                 />
-                                                <GridColumn field="date" title="Date" width="120px"/>
+                                                <GridColumn field="result" title="Ergebnis" width="100px"
+                                                            cell={({dataItem}) => (
+                                                                <td style={{padding: '8px'}}>
+                <span style={{
+                    padding: '4px 12px',
+                    borderRadius: '12px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    backgroundColor: dataItem.result === 'Win' ? '#10b981' : '#ef4444',
+                    color: 'white'
+                }}>
+                    {dataItem.result === 'Win' ? '🏆 Win' : '💣 Lose'}
+                </span>
+                                                                </td>
+                                                            )}
+                                                />
+                                                <GridColumn field="date" title="Datum" width="120px"/>
                                             </Grid>
+
                                         </CardBody>
                                     </Card>
                                 </div>
                             </TabStripTab>
 
                             {/* Profile Tab */}
-                            <TabStripTab title="👤 Player Profile">
+                            <TabStripTab title="👤 Benutzer">
                                 <div style={{padding: '30px'}}>
-                                    <div style={{maxWidth: '600px', margin: '0 auto'}}>
-                                        <Card style={{borderRadius: '15px', boxShadow: '0 5px 15px rgba(0,0,0,0.1)'}}>
+                                    <div style={{maxWidth: '800px', margin: '0 auto'}}>
+                                        <Card>
                                             <CardBody>
-                                                <CardTitle style={{
-                                                    marginBottom: '30px',
-                                                    color: '#374151',
-                                                    textAlign: 'center'
-                                                }}>
-                                                    🎮 Player Profile
-                                                </CardTitle>
+                                                <CardTitle>Benutzer verwalten</CardTitle>
 
+                                                {/* Neuen Benutzer erstellen */}
                                                 <div style={{marginBottom: '25px'}}>
-                                                    <label style={{
-                                                        display: 'block',
-                                                        marginBottom: '8px',
-                                                        fontWeight: '600',
-                                                        color: '#374151'
-                                                    }}>
-                                                        Player Name:
-                                                    </label>
                                                     <Input
                                                         value={playerName}
                                                         onChange={(e) => setPlayerName(e.value)}
-                                                        placeholder="Enter your name..."
-                                                        style={{width: '100%'}}
+                                                        placeholder="Neuer Benutzername..."
                                                     />
+                                                    <Button
+                                                        onClick={() => addUser(playerName)}
+                                                        style={{marginLeft: '10px'}}
+                                                    >
+                                                        Benutzer erstellen
+                                                    </Button>
                                                 </div>
 
+                                                {/* Benutzer auswählen */}
                                                 <div style={{marginBottom: '25px'}}>
-                                                    <label style={{
-                                                        display: 'block',
-                                                        marginBottom: '8px',
-                                                        fontWeight: '600',
-                                                        color: '#374151'
-                                                    }}>
-                                                        Favorite Game Date:
-                                                    </label>
-                                                    <Calendar
-                                                        value={gameDate}
-                                                        onChange={(e) => setGameDate(e.value)}
+                                                    <label>Aktiver Benutzer:</label>
+                                                    <DropDownList
+                                                        data={users}
+                                                        value={currentUser}
+                                                        onChange={(e) => setCurrentUser(e.value)}
+                                                        style={{width: '200px'}}
                                                     />
                                                 </div>
 
-                                                <div style={{
-                                                    background: 'linear-gradient(135deg, #f8fafc, #e2e8f0)',
-                                                    padding: '20px',
-                                                    borderRadius: '15px',
-                                                    textAlign: 'center'
-                                                }}>
-                                                    <h3 style={{color: '#374151', marginBottom: '15px'}}>🏆 Your
-                                                        Stats</h3>
-                                                    <div style={{
-                                                        display: 'grid',
-                                                        gridTemplateColumns: '1fr 1fr 1fr',
-                                                        gap: '15px'
-                                                    }}>
-                                                        <div>
-                                                            <div style={{fontSize: '2rem', color: '#10b981'}}>
-                                                                {gameStats.filter(g => g.result === 'Win').length}
-                                                            </div>
-                                                            <div style={{fontSize: '0.9rem', color: '#6b7280'}}>Total
-                                                                Wins
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            <div style={{fontSize: '2rem', color: '#f59e0b'}}>
-                                                                {gameStats.length}
-                                                            </div>
-                                                            <div style={{fontSize: '0.9rem', color: '#6b7280'}}>Games
-                                                                Played
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            <div style={{fontSize: '2rem', color: '#8b5cf6'}}>
-                                                                {gameStats.length > 0 ? Math.round((gameStats.filter(g => g.result === 'Win').length / gameStats.length) * 100) : 0}%
-                                                            </div>
-                                                            <div style={{fontSize: '0.9rem', color: '#6b7280'}}>Win
-                                                                Rate
-                                                            </div>
-                                                        </div>
+                                                {/* Benutzerstatistiken */}
+                                                {currentUser && (
+                                                    <div>
+                                                        <h3>Statistiken für {currentUser}</h3>
+                                                        <Grid
+                                                            data={gameStats.filter(game => currentUser ? game.username === currentUser : true)}
+                                                            sortable={true}
+                                                            style={{height: '350px'}}
+                                                        >
+                                                            <GridColumn field="username" title="Spieler" width="120px"/>
+                                                            <GridColumn field="level" title="Level" width="100px"/>
+                                                            <GridColumn
+                                                                field="time"
+                                                                title="Zeit (s)"
+                                                                width="120px"
+                                                                cell={({dataItem}) => (
+                                                                    <td>{formatTime(dataItem.time)}</td>
+                                                                )}
+                                                            />
+                                                            <GridColumn field="result" title="Ergebnis" width="100px"
+                                                                        cell={({dataItem}) => (
+                                                                            <td style={{padding: '8px'}}>
+                <span style={{
+                    padding: '4px 12px',
+                    borderRadius: '12px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    backgroundColor: dataItem.result === 'Win' ? '#10b981' : '#ef4444',
+                    color: 'white'
+                }}>
+                    {dataItem.result === 'Win' ? '🏆 Win' : '💣 Lose'}
+                </span>
+                                                                            </td>
+                                                                        )}
+                                                            />
+                                                            <GridColumn field="date" title="Datum" width="120px"/>
+                                                        </Grid>
+
                                                     </div>
-                                                </div>
+                                                )}
                                             </CardBody>
                                         </Card>
                                     </div>
                                 </div>
                             </TabStripTab>
+
+
                         </TabStrip>
                     </CardBody>
                 </Card>
