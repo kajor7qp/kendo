@@ -38,13 +38,18 @@ function App() {
     const [loading, setLoading] = useState(false);
 
     // Statistics
-    const [gameStats, setGameStats] = useState([
-        {id: 1, level: 'Easy', time: 45, result: 'Win', date: '2024-09-10'},
-        {id: 2, level: 'Medium', time: 120, result: 'Win', date: '2024-09-11'},
-        {id: 3, level: 'Hard', time: 300, result: 'Lose', date: '2024-09-12'},
-    ]);
+    const [gameStats, setGameStats] = useState(() => {
+        const savedStats = localStorage.getItem('minesweeperStats');
+        return savedStats ? JSON.parse(savedStats) : [];
+    });
+
 
     const {rows, cols, mines} = LEVELS[level];
+
+    useEffect(() => {
+        localStorage.setItem('minesweeperStats', JSON.stringify(gameStats));
+    }, [gameStats]);
+
 
     // Timer effect
     useEffect(() => {
@@ -63,6 +68,13 @@ function App() {
                 type: {style: 'error', icon: true},
                 content: '💣 Game Over! Try again!'
             });
+            setGameStats(prev => [...prev, {
+                id: prev.length + 1,
+                level: level.charAt(0).toUpperCase() + level.slice(1),
+                time: elapsed,
+                result: 'Lose',
+                date: new Date().toISOString().split('T')[0]
+            }]);
         } else if (win) {
             setNotification({
                 id: Date.now(),
@@ -248,15 +260,35 @@ function App() {
 
     // Chart data for statistics
     const winLossData = [
-        {category: 'Wins', value: gameStats.filter(g => g.result === 'Win').length, color: '#10b981'},
-        {category: 'Losses', value: gameStats.filter(g => g.result === 'Lose').length, color: '#ef4444'}
+        {
+            category: 'Wins',
+            value: gameStats.filter(g => g.result === 'Win').length,
+            color: '#10b981'
+        },
+        {
+            category: 'Losses',
+            value: gameStats.filter(g => g.result === 'Lose').length,
+            color: '#ef4444'
+        }
     ];
+
 
     const levelData = LEVELS ? Object.keys(LEVELS).map(lvl => ({
         level: lvl.charAt(0).toUpperCase() + lvl.slice(1),
         games: gameStats.filter(g => g.level.toLowerCase() === lvl).length,
         color: lvl === 'easy' ? '#10b981' : lvl === 'medium' ? '#f59e0b' : '#ef4444'
     })) : [];
+
+    const resetStatistics = () => {
+        setGameStats([]);
+        localStorage.removeItem('minesweeperStats');
+        setNotification({
+            id: Date.now(),
+            type: {style: 'info', icon: true},
+            content: 'Statistics have been reset!'
+        });
+    };
+
 
     let face = "😊";
     if (gameOver) face = "😵";
@@ -494,6 +526,18 @@ function App() {
 
                             {/* Statistics Tab */}
                             <TabStripTab title="📊 Statistics">
+                                <div style={{textAlign: 'right', marginBottom: '20px'}}>
+                                    <Button
+                                        onClick={resetStatistics}
+                                        style={{
+                                            backgroundColor: '#ef4444',
+                                            color: 'white'
+                                        }}
+                                    >
+                                        🗑️ Reset Statistics
+                                    </Button>
+                                </div>
+
                                 <div style={{padding: '30px'}}>
                                     <div style={{
                                         display: 'grid',
@@ -518,9 +562,14 @@ function App() {
                                                             categoryField="category"
                                                             field="value"
                                                             colorField="color"
+                                                            labels={{
+                                                                visible: true,
+                                                                content: (e) => `${e.category}: ${e.value}`
+                                                            }}
                                                         />
                                                     </ChartSeries>
                                                 </Chart>
+
                                             </CardBody>
                                         </Card>
 
@@ -532,6 +581,7 @@ function App() {
                                                 </CardTitle>
                                                 <Chart style={{height: '300px'}}>
                                                     <ChartTitle text=""/>
+                                                    <ChartLegend position="bottom"/>
                                                     <ChartSeries>
                                                         <ChartSeriesItem
                                                             type="column"
@@ -539,9 +589,14 @@ function App() {
                                                             categoryField="level"
                                                             field="games"
                                                             colorField="color"
+                                                            labels={{
+                                                                visible: true,
+                                                                content: (e) => e.dataItem.games
+                                                            }}
                                                         />
                                                     </ChartSeries>
                                                 </Chart>
+
                                             </CardBody>
                                         </Card>
                                     </div>
