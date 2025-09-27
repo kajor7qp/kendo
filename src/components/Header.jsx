@@ -1,15 +1,17 @@
-import React from "react";
-import { Button } from "@progress/kendo-react-buttons";
+import React from 'react';
+import { Button } from '@progress/kendo-react-buttons';
 
 const Header = ({ rows, cols, mines, time, onReset }) => {
     return (
-        <div className="flex items-center justify-between w-full max-w-lg mb-4 p-2 bg-white shadow rounded-lg">
-            <div>
-                <p className="text-sm">Größe: {rows} × {cols}</p>
-                <p className="text-sm">Minen: {mines}</p>
+        <div style={{ textAlign: 'center' }}>
+            <div style={{ marginBottom: '10px', fontWeight: '600', color: '#374151' }}>
+                Board: {rows}x{cols}, Mines: {mines}
             </div>
-            <div className="text-lg font-mono font-bold">⏱ {time}</div>
-            <Button themeColor="primary" onClick={onReset}>🔄 Reset</Button>
+            <div style={{ marginBottom: '10px' }}>
+                <span style={{ fontWeight: '600', color: '#374151' }}>Time: </span>
+                <span style={{ fontSize: '1.2rem', color: '#059669' }}>{time}</span>
+            </div>
+            <Button onClick={onReset}>Reset Game</Button>
         </div>
     );
 };
