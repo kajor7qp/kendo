@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TabStrip, TabStripTab } from '@progress/kendo-react-layout';
-import { NotificationGroup } from '@progress/kendo-react-notification';
+import { Notification, NotificationGroup } from '@progress/kendo-react-notification'; // Explicitly import Notification
 import GameTab from './components/GameTab.jsx';
 import StatisticsTab from './components/StatisticsTab.jsx';
 import ProfileTab from './components/ProfileTab.jsx';
@@ -155,4 +155,3 @@ function App() {
 }
 
 export default App;
-

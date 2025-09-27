@@ -1,0 +1,52 @@
+/* Ensure TabStrip tabs are horizontal */
+.k-tabstrip > .k-tabstrip-items {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+}
+
+.k-tabstrip-items .k-item {
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transition: background 0.3s ease;
+}
+
+.k-tabstrip-items .k-item.k-state-active {
+    background: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+/* Notification styles */
+.custom-notification {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    min-width: 300px;
+    padding: 10px 20px;
+}
+
+.custom-notification .k-notification-content {
+    font-weight: 500;
+    color: #374151;
+}
+
+/* Difficulty dropdown styles */
+.custom-dropdown {
+    width: 150px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 5px;
+}
+
+.custom-dropdown .k-dropdown-wrap {
+    background: transparent;
+    color: #374151;
+    font-weight: 500;
+}
