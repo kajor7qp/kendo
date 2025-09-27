@@ -1,14 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const useNotification = () => {
     const [notification, setNotification] = useState(null);
 
-    const showNotification = ({ type, content }) => {
-        setNotification({
-            id: Date.now(),
-            type,
-            content
-        });
+    useEffect(() => {
+        let timeoutId;
+        if (notification) {
+            timeoutId = setTimeout(() => {
+                setNotification(null);
+            }, 2000);
+        }
+        return () => clearTimeout(timeoutId);
+    }, [notification]);
+
+    const showNotification = (type, content) => {
+        let notificationData;
+        // Handle case where type and content are passed as a single object (e.g., from StatisticsTab)
+        if (typeof type === 'object' && type !== null && 'type' in type && 'content' in type) {
+            notificationData = {
+                type: type.type || { style: 'info', icon: true },
+                content: type.content || 'No content provided'
+            };
+            console.warn('showNotification called with single object; use separate type and content arguments for clarity', type);
+        } else {
+            notificationData = {
+                type: type || { style: 'info', icon: true },
+                content: content || 'No content provided'
+            };
+        }
+        if (!notificationData.content) {
+            console.error('Notification content is empty or undefined:', notificationData);
+        }
+        setNotification(notificationData);
     };
 
     const hideNotification = () => {
