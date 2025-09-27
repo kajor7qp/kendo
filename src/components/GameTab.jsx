@@ -86,7 +86,7 @@ const GameTab = ({
                     />
                 </div>
 
-                <div style={{textAlign: 'center'}}>
+                <div style={{ textAlign: 'center', width: '120px' }}> {/* Fixed width to prevent shifts */}
                     <div style={{
                         fontSize: '3rem',
                         marginBottom: '10px',
