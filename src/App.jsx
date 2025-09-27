@@ -26,7 +26,6 @@ function App() {
         gameOver,
         win,
         elapsed,
-        firstClick,
         loading,
         minesLeft,
         face,

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const useStatistics = (currentUser) => {
+const useStatistics = () => {
     const [gameStats, setGameStats] = useState(() => {
         const savedStats = localStorage.getItem('minesweeperStats');
         return savedStats ? JSON.parse(savedStats) : [];

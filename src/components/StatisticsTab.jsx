@@ -5,7 +5,7 @@ import { Card, CardBody, CardTitle } from '@progress/kendo-react-layout';
 import { Chart, ChartSeries, ChartSeriesItem, ChartTitle, ChartLegend } from '@progress/kendo-react-charts';
 import { DropDownList } from '@progress/kendo-react-dropdowns';
 
-const StatisticsTab = ({ gameStats, resetStatistics, currentUser, formatTime, showNotification }) => {
+const StatisticsTab = ({ gameStats, resetStatistics, formatTime, showNotification }) => {
     const [selectedUser, setSelectedUser] = useState('All Users');
     const users = ['All Users', ...new Set(gameStats.map(game => game.username))];
 
@@ -21,7 +21,7 @@ const StatisticsTab = ({ gameStats, resetStatistics, currentUser, formatTime, sh
             color: '#ef4444'
         }
     ];
-
+1
     const levelData = Object.keys({
         easy: { rows: 9, cols: 9, mines: 10 },
         medium: { rows: 16, cols: 16, mines: 40 },
