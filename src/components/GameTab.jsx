@@ -1,10 +1,10 @@
 import React from 'react';
-import { Button } from '@progress/kendo-react-buttons';
-import { DropDownList } from '@progress/kendo-react-dropdowns';
-import { Card, CardHeader, CardBody } from '@progress/kendo-react-layout';
-import { Loader } from '@progress/kendo-react-indicators';
+import {Button} from '@progress/kendo-react-buttons';
+import {DropDownList} from '@progress/kendo-react-dropdowns';
+import {Card, CardHeader, CardBody} from '@progress/kendo-react-layout';
+import {Loader} from '@progress/kendo-react-indicators';
 import Header from './Header.jsx';
-import { numberColors } from '../utils/styles.js';
+import {numberColors} from '../utils/styles.js';
 
 const GameTab = ({
                      level,
@@ -21,17 +21,15 @@ const GameTab = ({
                      formatTime,
                      levels
                  }) => {
-    const { rows, cols } = levels[level];
+    const {rows, cols} = levels[level];
 
     const gameAreaStyle = {
         display: 'grid',
         gridTemplateColumns: `repeat(${cols}, 35px)`,
         gap: '2px',
-        justifyContent: 'center',
         background: 'rgba(0, 0, 0, 0.2)',
         padding: '20px',
-        borderRadius: '15px',
-        marginBottom: '20px'
+        borderRadius: '15px'
     };
 
     const cellStyle = (cell) => ({
@@ -60,7 +58,7 @@ const GameTab = ({
     });
 
     return (
-        <div style={{ padding: '30px' }}>
+        <div style={{padding: '30px'}}>
             <div style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr auto 1fr',
@@ -71,7 +69,7 @@ const GameTab = ({
                 background: 'linear-gradient(135deg, #f8fafc, #e2e8f0)',
                 borderRadius: '15px'
             }}>
-                <div>
+                <div style={{textAlign: 'center'}}>
                     <label style={{
                         display: 'block',
                         marginBottom: '10px',
@@ -88,7 +86,7 @@ const GameTab = ({
                     />
                 </div>
 
-                <div style={{ textAlign: 'center' }}>
+                <div style={{textAlign: 'center'}}>
                     <div style={{
                         fontSize: '3rem',
                         marginBottom: '10px',
@@ -99,10 +97,10 @@ const GameTab = ({
                         display: 'inline-block',
                         boxShadow: '0 5px 15px rgba(0, 0, 0, 0.2)'
                     }} onClick={() => resetGame(level)}>
-                        {loading ? <Loader size="small" /> : face}
+                        {loading ? <Loader size="small"/> : face}
                     </div>
-                    <div style={{ fontSize: '1.2rem', fontWeight: '600', color: '#374151' }}>
-                        {gameOver ? 'Game Over!' : win ? 'You Win!' : 'Playing...'}
+                    <div style={{fontSize: '1.2rem', fontWeight: '600', color: '#374151'}}>
+                        {gameOver ? 'Game Over!' : win ? 'You Win!' : elapsed === 0 ? '' : 'Playing...'}
                     </div>
                 </div>
 
@@ -112,29 +110,22 @@ const GameTab = ({
                     mines={levels[level].mines}
                     time={formatTime(elapsed)}
                     onReset={resetGame}
-                    level={level} // Pass level to Header
+                    level={level}
                 />
 
-                <div style={{ textAlign: 'right' }}>
-                    <div style={{ marginBottom: '10px' }}>
-                        <span style={{ fontWeight: '600', color: '#374151' }}>🚩 Mines Left: </span>
-                        <span style={{ fontSize: '1.2rem', color: '#ef4444' }}>{minesLeft}</span>
+                <div style={{textAlign: 'center'}}>
+                    <div style={{marginBottom: '10px'}}>
+                        <span style={{fontWeight: '600', color: '#374151'}}>🚩 Mines Left: </span>
+                        <span style={{fontSize: '1.2rem', color: '#ef4444'}}>{minesLeft}</span>
                     </div>
                     <div>
-                        <span style={{ fontWeight: '600', color: '#374151' }}>⏱ Time: </span>
-                        <span style={{ fontSize: '1.2rem', color: '#059669' }}>{formatTime(elapsed)}</span>
+                        <span style={{fontWeight: '600', color: '#374151'}}>⏱ Time: </span>
+                        <span style={{fontSize: '1.2rem', color: '#059669'}}>{formatTime(elapsed)}</span>
                     </div>
                 </div>
             </div>
 
-            <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                background: 'linear-gradient(135deg, #1e293b, #334155)',
-                padding: '30px',
-                borderRadius: '20px',
-                marginBottom: '20px'
-            }}>
+            <div className="game-board-container">
                 <div style={gameAreaStyle} onContextMenu={(e) => e.preventDefault()}>
                     {board.flat().map(cell => {
                         let content = '';
@@ -176,7 +167,7 @@ const GameTab = ({
                 </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '15px' }}>
+            <div style={{display: 'flex', justifyContent: 'center', gap: '15px', marginTop: '20px'}}>
                 <Button onClick={() => resetGame('easy')}>
                     🟢 Easy Game
                 </Button>
@@ -188,14 +179,15 @@ const GameTab = ({
                 </Button>
             </div>
 
-            <Card style={{ marginTop: "20px", maxWidth: "420px" }}>
+            <Card
+                style={{marginTop: '20px', maxWidth: '420px', width: '100%', marginLeft: 'auto', marginRight: 'auto'}}>
                 <CardHeader>
                     <h5 className="k-card-title">💡 Spielfunktionen</h5>
                 </CardHeader>
                 <CardBody>
                     <p className="text-sm text-gray-700 leading-relaxed">
                         - <strong>Linksklick auf Zahl</strong>: Deckt alle Nachbarn auf, wenn
-                        die richtige Anzahl Flaggen gesetzt ist. <br />
+                        die richtige Anzahl Flaggen gesetzt ist. <br/>
                         - <strong>Links+Rechtsklick (Chord)</strong>: Profi-Shortcut, der das
                         gleiche macht – schneller und ohne Extra-Klick.
                     </p>

@@ -34,17 +34,9 @@ function App() {
         handleCellRightClick
     } = useGameLogic(LEVELS, showNotification, addGameStat, currentUser);
 
-    const containerStyle = {
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%)',
-        padding: '20px',
-        fontFamily: "'Inter', sans-serif",
-        color: 'white'
-    };
-
     return (
-        <div style={containerStyle}>
-            <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+        <div className="app-container">
+            <div style={{ width: '100%', maxWidth: '1400px' }}>
                 <div style={{
                     background: 'rgba(255, 255, 255, 0.1)',
                     backdropFilter: 'blur(20px)',
