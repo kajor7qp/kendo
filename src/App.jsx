@@ -106,8 +106,8 @@ function App() {
                         🚀 Built for KendoReact Challenge with ❤️
                     </p>
                     <div style={{ fontSize: '0.9rem', opacity: 0.8 }}>
-                        <strong>11+ KendoReact Components:</strong> Button, DropDownList, Grid, Chart, Card,
-                        TabStrip, Notification, Input, Calendar, Loader, NotificationGroup
+                        <strong>KendoReact Components:</strong> Button, DropDownList, Card, TabStrip, Notification,
+                        NotificationGroup, Loader, Grid, Chart, Input
                     </div>
                 </div>
 

@@ -59,6 +59,7 @@ A complete gaming dashboard featuring:
 - **Statistics**: Real-time game tracking and analytics
 - **Responsive**: Mobile-friendly responsive design
 
+# Developping
 ## 🚀 Getting Started
 ``` bash
 git clone [your-gitlab-url]
@@ -67,63 +68,73 @@ npm install
 npm run dev
 ``` 
 
-# React + Vite
+# KendoReact Components Used in Minesweeper Application
 
-## Projekt aufsetzen
+The following KendoReact components are used in the Minesweeper application, based on the provided code in `App.jsx`, `GameTab.jsx`, `StatisticsTab.jsx`, `Header.jsx`, and `ProfileTab.jsx`.
 
-```
-npm create vite@latest kendo-vite-app -- --template react 
-```
-``` 
-cd kendo-vite-app
-```
-``` 
-npm install
-```
+## Primary Components
+1. **Button** (`@progress/kendo-react-buttons`)
+    - **Usage**: Reset game, select difficulty levels, reset statistics, create users.
+    - **Files**: `GameTab.jsx` (difficulty buttons, `Header` reset), `StatisticsTab.jsx` (reset statistics), `ProfileTab.jsx` (create user), `Header.jsx` (reset game).
+    - **Purpose**: Triggers actions like starting a new game, changing difficulty, resetting statistics, or adding users.
 
-```Kendoo Installieren
-npm install @progress/kendo-react-grid @progress/kendo-react-dateinputs @progress/kendo-react-charts @progress/kendo-react-buttons @progress/kendo-react-inputs @progress/kendo-react-dropdowns @progress/kendo-react-notification @progress/kendo-react-layout @progress/kendo-react-indicators @progress/kendo-theme-default
-```
+2. **DropDownList** (`@progress/kendo-react-dropdowns`)
+    - **Usage**: Select difficulty level, select active user for statistics or user management.
+    - **Files**: `GameTab.jsx` (difficulty), `StatisticsTab.jsx` (user selection), `ProfileTab.jsx` (active user).
+    - **Purpose**: Allows selection from predefined options (e.g., easy/medium/hard, usernames).
 
-``` Start
-npm run dev
-```
+3. **Card** (`@progress/kendo-react-layout`)
+    - **Usage**: Structures content for game features, statistics charts, and user management.
+    - **Files**: `GameTab.jsx` (game features), `StatisticsTab.jsx` (charts and grid), `ProfileTab.jsx` (user management).
+    - **Sub-components**: Includes `CardHeader`, `CardBody`, `CardTitle`.
+    - **Purpose**: Organizes content in visually appealing cards.
 
-----
-## Git Projekt
+4. **TabStrip** (`@progress/kendo-react-layout`)
+    - **Usage**: Navigation tabs for switching between game, statistics, and user views.
+    - **Files**: `App.jsx`.
+    - **Sub-components**: Includes `TabStripTab`.
+    - **Purpose**: Provides tabbed navigation interface.
 
-### Im Gitbash
-```
-cd Pfad\zu\deinem\Verzeichnis
-```
-```
-git init
-```
-```
-git add .
-```
-```
-git commit -m "Initialer Commit"
-```
-```
-git remote add origin https://gitlab.com/benutzername/projektname.git
-```
-```
-git push --set-upstream origin master
-```
-[readme.md](../../git/readme.md)
+5. **Notification** (`@progress/kendo-react-notification`)
+    - **Usage**: Displays feedback messages for user actions (e.g., resetting statistics).
+    - **Files**: `App.jsx`.
+    - **Purpose**: Shows temporary notifications.
 
----- 
+6. **NotificationGroup** (`@progress/kendo-react-notification`)
+    - **Usage**: Groups notifications for consistent positioning.
+    - **Files**: `App.jsx`.
+    - **Purpose**: Manages notification placement (e.g., bottom center).
 
-## Vite
+7. **Loader** (`@progress/kendo-react-indicators`)
+    - **Usage**: Indicates loading state during game board initialization.
+    - **Files**: `GameTab.jsx`.
+    - **Purpose**: Shows a loading spinner when resetting the game.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+8. **Grid** (`@progress/kendo-react-grid`)
+    - **Usage**: Displays game history and user-specific statistics in tables.
+    - **Files**: `StatisticsTab.jsx` (game history), `ProfileTab.jsx` (user statistics).
+    - **Sub-components**: Includes `GridColumn`.
+    - **Purpose**: Presents tabular data with sortable columns.
 
-Currently, two official plugins are available:
+9. **Chart** (`@progress/kendo-react-charts`)
+    - **Usage**: Visualizes Win/Loss Ratio (donut chart) and Games by Difficulty (column chart).
+    - **Files**: `StatisticsTab.jsx`.
+    - **Sub-components**: Includes `ChartSeries`, `ChartSeriesItem`, `ChartTitle`, `ChartLegend`.
+    - **Purpose**: Displays graphical statistics.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+10. **Input** (`@progress/kendo-react-inputs`)
+    - **Usage**: Allows entering a new username for user creation.
+    - **Files**: `ProfileTab.jsx`.
+    - **Purpose**: Provides text input for usernames.
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Notes
+- **Total Components**: 10 primary components are used, with sub-components (`CardHeader`, `CardBody`, `CardTitle`, `TabStripTab`, `GridColumn`, `ChartSeries`, `ChartSeriesItem`, `ChartTitle`, `ChartLegend`) supporting the primary ones.
+- **CDN Dependencies**: The components are loaded via CDN, requiring packages:
+    - `@progress/kendo-react-buttons`
+    - `@progress/kendo-react-dropdowns`
+    - `@progress/kendo-react-layout`
+    - `@progress/kendo-react-notification`
+    - `@progress/kendo-react-indicators`
+    - `@progress/kendo-react-grid`
+    - `@progress/kendo-react-charts`
+    - `@progress/kendo-react-inputs`
