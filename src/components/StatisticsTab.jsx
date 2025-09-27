@@ -1,19 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@progress/kendo-react-buttons';
-import { Grid, GridColumn } from '@progress/kendo-react-grid'; // Corrected import
+import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import { Card, CardBody, CardTitle } from '@progress/kendo-react-layout';
 import { Chart, ChartSeries, ChartSeriesItem, ChartTitle, ChartLegend } from '@progress/kendo-react-charts';
+import { DropDownList } from '@progress/kendo-react-dropdowns';
 
 const StatisticsTab = ({ gameStats, resetStatistics, currentUser, formatTime, showNotification }) => {
+    const [selectedUser, setSelectedUser] = useState('All Users');
+    const users = ['All Users', ...new Set(gameStats.map(game => game.username))];
+
     const winLossData = [
         {
             category: 'Wins',
-            value: gameStats.filter(g => g.result === 'Win').length,
+            value: gameStats.filter(g => g.result === 'Win' && (selectedUser === 'All Users' || g.username === selectedUser)).length,
             color: '#10b981'
         },
         {
             category: 'Losses',
-            value: gameStats.filter(g => g.result === 'Lose').length,
+            value: gameStats.filter(g => g.result === 'Lose' && (selectedUser === 'All Users' || g.username === selectedUser)).length,
             color: '#ef4444'
         }
     ];
@@ -24,13 +28,24 @@ const StatisticsTab = ({ gameStats, resetStatistics, currentUser, formatTime, sh
         hard: { rows: 16, cols: 30, mines: 99 }
     }).map(lvl => ({
         level: lvl.charAt(0).toUpperCase() + lvl.slice(1),
-        games: gameStats.filter(g => g.level.toLowerCase() === lvl).length,
+        games: gameStats.filter(g => g.level.toLowerCase() === lvl && (selectedUser === 'All Users' || g.username === selectedUser)).length,
         color: lvl === 'easy' ? '#10b981' : lvl === 'medium' ? '#f59e0b' : '#ef4444'
     }));
 
     return (
         <div style={{ padding: '30px' }}>
-            <div style={{ textAlign: 'right', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <div>
+                    <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', color: '#374151' }}>
+                        Select User:
+                    </label>
+                    <DropDownList
+                        data={users}
+                        value={selectedUser}
+                        onChange={(e) => setSelectedUser(e.value)}
+                        className="custom-dropdown"
+                    />
+                </div>
                 <Button
                     onClick={() => {
                         resetStatistics();
@@ -111,7 +126,7 @@ const StatisticsTab = ({ gameStats, resetStatistics, currentUser, formatTime, sh
                         📈 Game History
                     </CardTitle>
                     <Grid
-                        data={gameStats.filter(game => currentUser ? game.username === currentUser : true)}
+                        data={gameStats.filter(game => selectedUser === 'All Users' ? true : game.username === selectedUser)}
                         sortable={true}
                         style={{ height: '350px' }}
                     >

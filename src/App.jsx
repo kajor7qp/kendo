@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TabStrip, TabStripTab } from '@progress/kendo-react-layout';
-import { Notification, NotificationGroup } from '@progress/kendo-react-notification'; // Explicitly import Notification
+import { Notification, NotificationGroup } from '@progress/kendo-react-notification';
 import GameTab from './components/GameTab.jsx';
 import StatisticsTab from './components/StatisticsTab.jsx';
 import ProfileTab from './components/ProfileTab.jsx';
@@ -63,7 +63,7 @@ function App() {
                     </p>
                 </div>
 
-                <TabStrip selected={selectedTab} onSelect={(e) => setSelectedTab(e.selected)}>
+                <TabStrip selected={selectedTab} onSelect={(e) => setSelectedTab(e.selected)} className="k-tabstrip">
                     <TabStripTab title="🎮 Play Game">
                         <GameTab
                             level={level}
@@ -136,16 +136,9 @@ function App() {
                             type={notification.type}
                             closable={true}
                             onClose={hideNotification}
-                            style={{
-                                marginBottom: '10px',
-                                borderRadius: '12px',
-                                boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
-                                minWidth: '300px'
-                            }}
+                            className="custom-notification"
                         >
-                            <span style={{ fontWeight: '500' }}>
-                                {notification.content}
-                            </span>
+                            <span>{notification.content}</span>
                         </Notification>
                     )}
                 </NotificationGroup>

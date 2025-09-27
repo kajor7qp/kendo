@@ -84,7 +84,7 @@ const GameTab = ({
                         data={['easy', 'medium', 'hard']}
                         value={level}
                         onChange={(e) => resetGame(e.value)}
-                        style={{ width: '150px' }}
+                        className="custom-dropdown"
                     />
                 </div>
 
@@ -98,7 +98,7 @@ const GameTab = ({
                         borderRadius: '50%',
                         display: 'inline-block',
                         boxShadow: '0 5px 15px rgba(0, 0, 0, 0.2)'
-                    }} onClick={() => resetGame()}>
+                    }} onClick={() => resetGame(level)}>
                         {loading ? <Loader size="small" /> : face}
                     </div>
                     <div style={{ fontSize: '1.2rem', fontWeight: '600', color: '#374151' }}>
@@ -112,6 +112,7 @@ const GameTab = ({
                     mines={levels[level].mines}
                     time={formatTime(elapsed)}
                     onReset={resetGame}
+                    level={level} // Pass level to Header
                 />
 
                 <div style={{ textAlign: 'right' }}>
