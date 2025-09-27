@@ -1,11 +1,3 @@
----
-title: 🚀 KendoReact Minesweeper Challenge - Modern Gaming Dashboard
-published: true
-description: A modern Minesweeper game built with KendoReact components featuring analytics, player profiles
-tags: devchallenge, kendoreactchallenge, webdev, react
-cover_image: [hard.png](src/assets/hard.png)
----
-
 # 🚀 KendoReact Minesweeper Challenge
 
 I built a modern Minesweeper game using KendoReact free components for the DEV Challenge!
