@@ -18,6 +18,7 @@ const useGameLogic = (LEVELS, showNotification, addGameStat, currentUser) => {
     const minesLeft = mines - flagsUsed;
 
     let face = "😊";
+    if (elapsed===0) face = "😄";
     if (gameOver) face = "😵";
     else if (win) face = "😎";
 

@@ -50,7 +50,7 @@ function App() {
                         💣 KendoReact Minesweeper
                     </h1>
                     <p style={{ fontSize: '1.2rem', opacity: 0.9 }}>
-                        Enhanced Minesweeper with KendoReact Components
+                        Minesweeper with KendoReact Components
                     </p>
                 </div>
 

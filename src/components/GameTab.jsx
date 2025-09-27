@@ -29,7 +29,7 @@ const GameTab = ({
         gap: '2px',
         background: 'rgba(0, 0, 0, 0.2)',
         padding: '20px',
-        borderRadius: '15px'
+        borderRadius: '5px',
     };
 
     const cellStyle = (cell) => ({
@@ -100,7 +100,7 @@ const GameTab = ({
                         {loading ? <Loader size="small"/> : face}
                     </div>
                     <div style={{fontSize: '1.2rem', fontWeight: '600', color: '#374151'}}>
-                        {gameOver ? 'Game Over!' : win ? 'You Win!' : elapsed === 0 ? '' : 'Playing...'}
+                        {gameOver ? 'Game Over!' : win ? 'You Win!' : elapsed === 0 ? 'Ready' : 'Playing...'}
                     </div>
                 </div>
 
@@ -108,21 +108,11 @@ const GameTab = ({
                     rows={rows}
                     cols={cols}
                     mines={levels[level].mines}
+                    minesLeft={minesLeft}
                     time={formatTime(elapsed)}
                     onReset={resetGame}
                     level={level}
                 />
-
-                <div style={{textAlign: 'center'}}>
-                    <div style={{marginBottom: '10px'}}>
-                        <span style={{fontWeight: '600', color: '#374151'}}>🚩 Mines Left: </span>
-                        <span style={{fontSize: '1.2rem', color: '#ef4444'}}>{minesLeft}</span>
-                    </div>
-                    <div>
-                        <span style={{fontWeight: '600', color: '#374151'}}>⏱ Time: </span>
-                        <span style={{fontSize: '1.2rem', color: '#059669'}}>{formatTime(elapsed)}</span>
-                    </div>
-                </div>
             </div>
 
             <div className="game-board-container">
